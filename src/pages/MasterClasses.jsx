@@ -62,7 +62,7 @@ const MasterClasses = () => {
       <div className="flex-1 p-4 sm:p-6 lg:p-10">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+          <h1 className="text-2xl sm:text-3xl font-bold text-red-500">
             Dashboard
           </h1>
           <div className="flex items-center bg-white shadow-sm rounded-full px-4 py-2 border border-gray-100 w-full sm:w-96">
