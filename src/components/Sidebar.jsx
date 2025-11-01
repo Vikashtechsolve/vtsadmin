@@ -1,44 +1,71 @@
+// src/components/Sidebar.jsx
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
-import logo from "../assets/logo.png";
+import { NavLink } from "react-router-dom";
 
-const Sidebar = () => {
-  const location = useLocation();
-
-  const menuItems = [
-    { name: "Dashboard", path: "/" },
-    { name: "Our Programs", path: "/programs" },
-    { name: "Our Products", path: "/products" },
-    { name: "About Us", path: "/about" },
-    { name: "Blogs", path: "/blogs" },
-    { name: "Settings", path: "/settings" },
+const Sidebar = ({ isOpen = false, onClose }) => {
+  const navItems = [
+    { name: "Dashboard", icon: "📊", path: "/" },
+    { name: "Our Programs", icon: "🎓", path: "/programs" },
+    { name: "Our Products", icon: "💻", path: "/products" },
+    { name: "About Us", icon: "ℹ️", path: "/about" },
+    { name: "Blogs", icon: "📰", path: "/blogs" },
+    { name: "Settings", icon: "⚙️", path: "/settings" },
   ];
 
   return (
-    <aside className="w-64 h-screen bg-white shadow-md flex flex-col p-6">
-      {/* Logo */}
-      <Link to="/" className="flex items-center space-x-2 mb-10">
-        <img src={logo} alt="VTS Logo" className="w-45 h-45 object-contain" />
-      
-      </Link>
+    <>
+      {/* Background overlay (mobile only) */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/30 z-40 md:hidden"
+          onClick={onClose}
+        ></div>
+      )}
 
-      {/* Navigation */}
-      <nav className="flex flex-col space-y-3 text-gray-700 font-medium">
-        {menuItems.map((item) => (
-          <Link
-            key={item.name}
-            to={item.path}
-            className={`text-left py-2 px-3 rounded-lg transition-colors duration-200 ${
-              location.pathname === item.path
-                ? "bg-red-50 text-red-600 font-semibold"
-                : "hover:bg-gray-100"
-            }`}
+      {/* Sidebar Container */}
+      <aside
+        className={`fixed md:static z-50 h-full w-64 bg-white border-r border-gray-100 p-6
+        transform transition-transform duration-300
+        ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
+      >
+        {/* Header Section */}
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <div className="text-2xl font-bold text-red-600">VTS</div>
+            <div className="text-xs text-gray-400">Vikash Tech Solution</div>
+          </div>
+
+          {/* Close Button (mobile only) */}
+          <button
+            className="md:hidden text-gray-500 text-2xl"
+            onClick={onClose}
           >
-            {item.name}
-          </Link>
-        ))}
-      </nav>
-    </aside>
+            ✕
+          </button>
+        </div>
+
+        {/* Navigation Links */}
+        <nav className="flex flex-col gap-2 text-gray-600">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.name}
+              to={item.path}
+              onClick={onClose}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors ${
+                  isActive
+                    ? "bg-red-50 text-red-600"
+                    : "hover:bg-gray-50 text-gray-700"
+                }`
+              }
+            >
+              <span className="text-lg">{item.icon}</span>
+              {item.name}
+            </NavLink>
+          ))}
+        </nav>
+      </aside>
+    </>
   );
 };
 
