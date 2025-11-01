@@ -19,6 +19,7 @@ import Products from "./pages/Products";
 import About from "./pages/About";
 import Blogs from "./pages/Blogs";
 import Settings from "./pages/Settings";
+import MasterClasses from "./pages/MasterClasses";
 
 /**
  * Layout Component
@@ -68,6 +69,8 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/programs/master-classes" element={<MasterClasses />} />
+
           {/* Redirect unknown paths */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
