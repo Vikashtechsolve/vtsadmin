@@ -1,0 +1,56 @@
+{
+  "overview": {
+    "upcomingEvents": 5,
+    "pastEvents": 12,
+    "totalRegistrations": 320,
+    "averageRating": 4.8
+  },
+  "upcomingEvents": [
+    {
+      "name": "Master React in 2 Hours",
+      "mentor": "Arjun Mehta",
+      "date": "Oct 25",
+      "time": "4:00 PM",
+      "status": "Scheduled"
+    },
+    {
+      "name": "Data Science Essentials",
+      "mentor": "Meera Jain",
+      "date": "Oct 27",
+      "time": "5:30 PM",
+      "status": "Scheduled"
+    }
+  ],
+  "pastEvents": [
+    {
+      "name": "Intro to AI",
+      "mentor": "Aditya Raj",
+      "date": "Oct 15",
+      "students": 30,
+      "rating": 4.8
+    },
+    {
+      "name": "Career in Web Dev",
+      "mentor": "Shreya Patel",
+      "date": "Oct 18",
+      "students": 35,
+      "rating": 4.9
+    }
+  ],
+  "mentors": [
+    { "name": "Ankit Verma", "role": "Full Stack Developer", "rating": 4.8 },
+    { "name": "Shreya Patel", "role": "Java Developer", "rating": 4.9 }
+  ],
+  "highlights": [
+    {
+      "title": "Interview Prep for Tech Roles",
+      "date": "28 Oct",
+      "time": "7:30 PM"
+    },
+    {
+      "title": "Roadmap to Full Stack Developer",
+      "date": "26 Oct",
+      "time": "4:30 PM"
+    }
+  ]
+}
