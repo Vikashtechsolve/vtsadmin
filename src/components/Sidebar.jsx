@@ -69,14 +69,15 @@ const Sidebar = ({ isOpen = false, onClose }) => {
         md:h-auto h-full font-['Inter']`}
       >
         {/* ===== Logo Section ===== */}
-        <div className="flex items-center justify-center py-6 border-b border-gray-100">
-          <img
-            src={logo}
-            alt="VTS Logo"
-            className="h-12 object-contain cursor-pointer"
-            onClick={() => navigate("/")}
-          />
-        </div>
+        <div className="flex items-center justify-center">
+        <img
+          src={logo}
+          alt="VTS Logo"
+          className="h-45 object-contain cursor-pointer"
+          onClick={() => navigate("/")}
+        />
+      </div>
+
 
         {/* ===== Navigation ===== */}
         <nav className="flex flex-col px-3 py-5 text-gray-700 font-medium text-[14px] space-y-2">
