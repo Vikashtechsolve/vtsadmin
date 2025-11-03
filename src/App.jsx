@@ -22,21 +22,20 @@ import Settings from "./pages/Settings";
 import MasterClasses from "./pages/MasterClasses";
 
 /**
- * Layout Component
- * Provides a shared structure (Sidebar + main content) for all pages
- * Also handles responsive sidebar toggling for mobile
+ * AppLayout Component
+ * Provides shared layout (Sidebar + Topbar + Content)
  */
 const AppLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="flex w-screen h-screen bg-gray-100 overflow-hidden">
-      {/* Sidebar (visible on large, toggleable on small) */}
+      {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Main Content */}
+      {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Topbar / Hamburger for mobile */}
+        {/* Mobile Header */}
         <header className="md:hidden flex items-center justify-between bg-white p-4 shadow-sm">
           <button
             onClick={() => setSidebarOpen(true)}
@@ -47,9 +46,9 @@ const AppLayout = () => {
           <h1 className="text-xl font-semibold text-red-600">VTS</h1>
         </header>
 
-        {/* Page Content */}
+        {/* Dynamic Route Outlet */}
         <main className="flex-1 overflow-y-auto">
-          <Outlet /> {/* renders current route content here */}
+          <Outlet />
         </main>
       </div>
     </div>
@@ -61,7 +60,7 @@ function App() {
     <Router>
       <ScrollToTop />
       <Routes>
-        {/* Shared layout for main dashboard routes */}
+        {/* Shared layout for all main routes */}
         <Route element={<AppLayout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/programs" element={<Programs />} />
@@ -69,9 +68,18 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/settings" element={<Settings />} />
-          <Route path="/programs/master-classes" element={<MasterClasses />} />
 
-          {/* Redirect unknown paths */}
+          {/* ✅ Unified route: both dashboard & event details handled by one file */}
+          <Route
+            path="/programs/master-classes"
+            element={<MasterClasses />}
+          />
+          <Route
+            path="/programs/master-classes/view/:id"
+            element={<MasterClasses />}
+          />
+
+          {/* Fallback route */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

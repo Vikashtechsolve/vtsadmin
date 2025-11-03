@@ -1,9 +1,23 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import {
+  LayoutDashboard,
+  BookOpen,
+  Laptop,
+  Info,
+  Newspaper,
+  Settings,
+  ChevronRight,
+  Users,
+  GraduationCap,
+  ClipboardList,
+  Headphones,
+  FileCheck2,
+} from "lucide-react";
 import logo from "../assets/logo.png";
 
 const Sidebar = ({ isOpen = false, onClose }) => {
-  const [openDropdown, setOpenDropdown] = useState(null);
+  const [openDropdown, setOpenDropdown] = useState("Our Programs");
   const navigate = useNavigate();
 
   const handleDropdownToggle = (name) => {
@@ -11,21 +25,35 @@ const Sidebar = ({ isOpen = false, onClose }) => {
   };
 
   const navItems = [
-    { name: "Dashboard", icon: "📊", path: "/" },
+    { name: "Dashboard", icon: <LayoutDashboard size={18} />, path: "/" },
     {
       name: "Our Programs",
-      icon: "🎓",
-      children: [{ name: "Master Classes", path: "/programs/master-classes" }],
+      icon: <BookOpen size={18} />,
+      children: [
+        { name: "Master Class", path: "/programs/master-classes" },
+        { name: "Mentorship", path: "/programs/mentorship" },
+        { name: "Online Contests", path: "/programs/online-contests" },
+        { name: "Resume Review & Roadmap", path: "/programs/resume-review" },
+        { name: "Live Doubt Solving", path: "/programs/live-doubt" },
+      ],
     },
-    { name: "Our Products", icon: "💻", path: "/products" },
-    { name: "About Us", icon: "ℹ️", path: "/about" },
-    { name: "Blogs", icon: "📰", path: "/blogs" },
-    { name: "Settings", icon: "⚙️", path: "/settings" },
+    {
+      name: "Our Products",
+      icon: <Laptop size={18} />,
+      children: [
+        { name: "LMS Portal", path: "/products/lms" },
+        { name: "Interview Portal", path: "/products/interview" },
+        { name: "Manpower Management", path: "/products/manpower" },
+      ],
+    },
+    { name: "About Us", icon: <Info size={18} />, path: "/about" },
+    { name: "Blogs", icon: <Newspaper size={18} />, path: "/blogs" },
+    { name: "Settings", icon: <Settings size={18} />, path: "/settings" },
   ];
 
   return (
     <>
-      {/* Mobile Overlay */}
+      {/* Overlay for mobile */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/30 z-40 md:hidden"
@@ -35,46 +63,38 @@ const Sidebar = ({ isOpen = false, onClose }) => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed md:static top-0 left-0 z-50 w-64 bg-white border-r border-gray-100 shadow-sm
+        className={`fixed md:static top-0 left-0 z-50 w-64 bg-white border-r border-gray-100 shadow-sm 
         transform transition-transform duration-300 ease-in-out
-        ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-        md:h-auto h-full`}
+        ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"} 
+        md:h-auto h-full font-['Inter']`}
       >
-        {/* Logo */}
-        <div className="flex items-center justify-between px-4 py-3 ">
-          <div className="flex items-center gap-2">
-            <img
-              src={logo}
-              alt="VTS Logo"
-              className="h-[160px] w-[250px] object-contain rounded-md"
-            />
-          </div>
-          <button
-            onClick={onClose}
-            className="md:hidden text-gray-500 text-2xl hover:text-gray-700"
-          >
-            ✕
-          </button>
+        {/* ===== Logo Section ===== */}
+        <div className="flex items-center justify-center py-6 border-b border-gray-100">
+          <img
+            src={logo}
+            alt="VTS Logo"
+            className="h-12 object-contain cursor-pointer"
+            onClick={() => navigate("/")}
+          />
         </div>
 
-        {/* Navigation */}
-        <nav className="flex flex-col px-3 py-4 text-gray-700">
+        {/* ===== Navigation ===== */}
+        <nav className="flex flex-col px-3 py-5 text-gray-700 font-medium text-[14px] space-y-2">
           {navItems.map((item) => (
             <div key={item.name}>
-              {/* Non-dropdown links */}
               {!item.children ? (
                 <NavLink
                   to={item.path}
                   onClick={onClose}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors ${
+                    `flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 border-l-[3px] ${
                       isActive
-                        ? "bg-red-50 text-red-600"
-                        : "hover:bg-gray-50 text-gray-700"
+                        ? "text-red-600 bg-red-50 border-red-600 font-semibold"
+                        : "text-gray-700 border-transparent hover:bg-gray-50 hover:text-red-600"
                     }`
                   }
                 >
-                  <span className="text-lg">{item.icon}</span>
+                  <span className="text-gray-500">{item.icon}</span>
                   <span>{item.name}</span>
                 </NavLink>
               ) : (
@@ -82,28 +102,27 @@ const Sidebar = ({ isOpen = false, onClose }) => {
                   {/* Dropdown Button */}
                   <button
                     onClick={() => handleDropdownToggle(item.name)}
-                    className={`flex items-center justify-between w-full px-3 py-2 rounded-lg font-medium transition-colors ${
+                    className={`flex items-center justify-between w-full px-4 py-2.5 rounded-lg transition-all duration-200 border-l-[3px] ${
                       openDropdown === item.name
-                        ? "bg-red-50 text-red-600"
-                        : "hover:bg-gray-50 text-gray-700"
+                        ? "bg-red-50 text-red-600 border-red-600 font-semibold"
+                        : "text-gray-700 border-transparent hover:bg-gray-50 hover:text-red-600"
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-lg">{item.icon}</span>
+                      <span className="text-gray-500">{item.icon}</span>
                       <span>{item.name}</span>
                     </div>
-                    <span
-                      className={`transition-transform duration-200 ${
-                        openDropdown === item.name ? "rotate-90" : ""
+                    <ChevronRight
+                      size={16}
+                      className={`transition-transform duration-300 ${
+                        openDropdown === item.name ? "rotate-90 text-red-500" : ""
                       }`}
-                    >
-                      ▶
-                    </span>
+                    />
                   </button>
 
                   {/* Dropdown Links */}
                   {openDropdown === item.name && (
-                    <div className="ml-8 mt-1 flex flex-col gap-1">
+                    <div className="ml-7 mt-1 flex flex-col gap-1 border-l border-red-200 pl-3">
                       {item.children.map((child) => (
                         <NavLink
                           key={child.name}
@@ -113,10 +132,10 @@ const Sidebar = ({ isOpen = false, onClose }) => {
                             onClose();
                           }}
                           className={({ isActive }) =>
-                            `block px-3 py-1.5 rounded-md text-sm transition-colors ${
+                            `block px-3 py-1.5 rounded-md text-[13px] transition-all duration-200 ${
                               isActive
                                 ? "bg-red-100 text-red-600 font-medium"
-                                : "hover:bg-gray-50 text-gray-700"
+                                : "text-gray-700 hover:text-red-600 hover:bg-gray-50"
                             }`
                           }
                         >

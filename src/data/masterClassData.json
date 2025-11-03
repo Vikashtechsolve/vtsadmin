@@ -7,34 +7,90 @@
   },
   "upcomingEvents": [
     {
+      "id": 1,
       "name": "Master React in 2 Hours",
       "mentor": "Arjun Mehta",
-      "date": "Oct 25",
-      "time": "4:00 PM",
-      "status": "Scheduled"
+      "date": "2025-10-25",
+      "time": "04:00 PM",
+      "status": "Scheduled",
+      "registrations": [
+        {
+          "name": "Priya Mehta",
+          "email": "priya22@gmail.com",
+          "mobile": "9670789050",
+          "graduationYear": "3rd Year",
+          "status": "Confirmed"
+        },
+        {
+          "name": "Karan Singh",
+          "email": "karan12@gmail.com",
+          "mobile": "9898765432",
+          "graduationYear": "Final Year",
+          "status": "Pending"
+        }
+      ]
     },
     {
+      "id": 2,
       "name": "Data Science Essentials",
       "mentor": "Meera Jain",
-      "date": "Oct 27",
-      "time": "5:30 PM",
-      "status": "Scheduled"
+      "date": "2025-10-27",
+      "time": "02:30 PM",
+      "status": "Scheduled",
+      "registrations": [
+        {
+          "name": "Ritika Sharma",
+          "email": "ritika.s@gmail.com",
+          "mobile": "9812234567",
+          "graduationYear": "2nd Year",
+          "status": "Confirmed"
+        }
+      ]
     }
   ],
   "pastEvents": [
     {
+      "id": 3,
       "name": "Intro to AI",
       "mentor": "Aditya Raj",
-      "date": "Oct 15",
-      "students": 30,
-      "rating": 4.8
+      "date": "2025-10-15",
+      "students": 150,
+      "rating": 4.6,
+      "feedback": "Great session on AI fundamentals!",
+      "registrations": [
+        {
+          "name": "Sneha Tiwari",
+          "email": "sneha.t@gmail.com",
+          "mobile": "9876543210",
+          "graduationYear": "Final Year",
+          "status": "Attended"
+        },
+        {
+          "name": "Amit Kumar",
+          "email": "amitkumar@example.com",
+          "mobile": "9090909090",
+          "graduationYear": "3rd Year",
+          "status": "Missed"
+        }
+      ]
     },
     {
+      "id": 4,
       "name": "Career in Web Dev",
       "mentor": "Shreya Patel",
-      "date": "Oct 18",
-      "students": 35,
-      "rating": 4.9
+      "date": "2025-10-18",
+      "students": 120,
+      "rating": 4.9,
+      "feedback": "Practical and engaging content.",
+      "registrations": [
+        {
+          "name": "Tanya Kapoor",
+          "email": "tanya.kapoor@gmail.com",
+          "mobile": "9988776655",
+          "graduationYear": "3rd Year",
+          "status": "Attended"
+        }
+      ]
     }
   ],
   "mentors": [
@@ -44,13 +100,13 @@
   "highlights": [
     {
       "title": "Interview Prep for Tech Roles",
-      "date": "28 Oct",
-      "time": "7:30 PM"
+      "date": "2025-10-28",
+      "time": "07:30 PM"
     },
     {
       "title": "Roadmap to Full Stack Developer",
-      "date": "26 Oct",
-      "time": "4:30 PM"
+      "date": "2025-10-26",
+      "time": "04:30 PM"
     }
   ]
 }
