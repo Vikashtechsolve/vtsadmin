@@ -19,7 +19,6 @@ import About from "./pages/About";
 import Blogs from "./pages/Blogs";
 import Settings from "./pages/Settings";
 import MasterClasses from "./pages/MasterClasses";
-import LoginPage from "./pages/LoginPage"; // ✅ Add this import
 
 /**
  * Shared layout (sidebar + content)
