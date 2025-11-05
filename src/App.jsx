@@ -1,4 +1,3 @@
-// src/App.jsx
 import React, { useState } from "react";
 import {
   BrowserRouter as Router,
@@ -8,11 +7,13 @@ import {
   Navigate,
 } from "react-router-dom";
 
-// Global utilities & components
 import ScrollToTop from "./components/ScrollToTop";
 import Sidebar from "./components/Sidebar";
 
-// Pages / Modules
+// 🛡 Import ProtectedRoute
+import ProtectedRoute from "./components/ProtectedRoute";
+
+// Pages
 import Dashboard from "./modules/dashboard/Dashboard";
 import Programs from "./pages/Programs";
 import Products from "./pages/Products";
@@ -21,21 +22,13 @@ import Blogs from "./pages/Blogs";
 import Settings from "./pages/Settings";
 import MasterClasses from "./pages/MasterClasses";
 
-/**
- * AppLayout Component
- * Provides shared layout (Sidebar + Topbar + Content)
- */
 const AppLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="flex w-screen h-screen bg-gray-100 overflow-hidden">
-      {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-
-      {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Mobile Header */}
         <header className="md:hidden flex items-center justify-between bg-white p-4 shadow-sm">
           <button
             onClick={() => setSidebarOpen(true)}
@@ -45,8 +38,6 @@ const AppLayout = () => {
           </button>
           <h1 className="text-xl font-semibold text-red-600">VTS</h1>
         </header>
-
-        {/* Dynamic Route Outlet */}
         <main className="flex-1 overflow-y-auto">
           <Outlet />
         </main>
@@ -60,26 +51,75 @@ function App() {
     <Router>
       <ScrollToTop />
       <Routes>
-        {/* Shared layout for all main routes */}
         <Route element={<AppLayout />}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/programs" element={<Programs />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/blogs" element={<Blogs />} />
-          <Route path="/settings" element={<Settings />} />
+          {/* 🔒 Protect all admin routes */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/programs"
+            element={
+              <ProtectedRoute>
+                <Programs />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/products"
+            element={
+              <ProtectedRoute>
+                <Products />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/about"
+            element={
+              <ProtectedRoute>
+                <About />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/blogs"
+            element={
+              <ProtectedRoute>
+                <Blogs />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            }
+          />
 
-          {/* ✅ Unified route: both dashboard & event details handled by one file */}
           <Route
             path="/programs/master-classes"
-            element={<MasterClasses />}
+            element={
+              <ProtectedRoute>
+                <MasterClasses />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="/programs/master-classes/view/:id"
-            element={<MasterClasses />}
+            element={
+              <ProtectedRoute>
+                <MasterClasses />
+              </ProtectedRoute>
+            }
           />
 
-          {/* Fallback route */}
+          {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
