@@ -19,19 +19,17 @@ import About from "./pages/About";
 import Blogs from "./pages/Blogs";
 import Settings from "./pages/Settings";
 import MasterClasses from "./pages/MasterClasses";
+import LoginPage from "./pages/LoginPage"; // ✅ Add this import
 
 /**
- * AppLayout: shared layout with sidebar and top bar
+ * Shared layout (sidebar + content)
  */
 const AppLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="flex w-screen h-screen bg-gray-100 overflow-hidden">
-      {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-
-      {/* Main Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Mobile header */}
         <header className="md:hidden flex items-center justify-between bg-white p-4 shadow-sm">
@@ -43,8 +41,6 @@ const AppLayout = () => {
           </button>
           <h1 className="text-xl font-semibold text-red-600">VTS</h1>
         </header>
-
-        {/* Dynamic outlet */}
         <main className="flex-1 overflow-y-auto">
           <Outlet />
         </main>
@@ -61,79 +57,35 @@ function App() {
     <Router>
       <ScrollToTop />
       <Routes>
-        {/* Shared Layout */}
-        <Route element={<AppLayout />}>
-          {/* ✅ Protected Routes */}
-          <Route
-            index
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/programs"
-            element={
-              <ProtectedRoute>
-                <Programs />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/products"
-            element={
-              <ProtectedRoute>
-                <Products />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/about"
-            element={
-              <ProtectedRoute>
-                <About />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/blogs"
-            element={
-              <ProtectedRoute>
-                <Blogs />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/settings"
-            element={
-              <ProtectedRoute>
-                <Settings />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/programs/master-classes"
-            element={
-              <ProtectedRoute>
-                <MasterClasses />
-              </ProtectedRoute>
-            }
-          />
+        {/* ✅ Public route */}
+        <Route path="/login" element={<LoginPage />} />
+
+        {/* ✅ Protect the entire admin layout */}
+        <Route
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Dashboard />} />
+          <Route path="/programs" element={<Programs />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/blogs" element={<Blogs />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/programs/master-classes" element={<MasterClasses />} />
           <Route
             path="/programs/master-classes/view/:id"
-            element={
-              <ProtectedRoute>
-                <MasterClasses />
-              </ProtectedRoute>
-            }
+            element={<MasterClasses />}
           />
-
-          {/* Fallback route */}
-          <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
+
+        {/* Fallback route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );
 }
+
 export default App;
