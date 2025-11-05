@@ -4,61 +4,45 @@ import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 
 /**
- * ✅ Protects all pages. Redirects to /login if:
- * - No token found
- * - Token invalid
- * - Role !== 'admin'
+ * Protects routes by validating JWT token and role.
+ * If invalid/missing, redirects to external login page.
  */
 const ProtectedRoute = ({ children }) => {
   const location = useLocation();
 
   try {
-    // Check token in cookies or session
+    // Get token from cookies or session
     const token =
       Cookies.get("token") || sessionStorage.getItem("token");
 
     if (!token) {
-      // 🚫 No token — force login
-      return (
-        <Navigate
-          to={`/login?message=${encodeURIComponent("Please login to continue.")}`}
-          state={{ from: location }}
-          replace
-        />
-      );
+      // 🚫 No token — redirect to external login
+      const redirectUrl = encodeURIComponent(window.location.href);
+      window.location.href = `https://www.vikashtechsolution.com/login?redirect=${redirectUrl}`;
+      return null;
     }
 
     // Decode token
     const decoded = jwtDecode(token);
 
     if (!decoded || decoded.role !== "admin") {
-      // 🚫 Not admin or invalid token
+      // 🚫 Not admin — clear token and redirect
       Cookies.remove("token");
       sessionStorage.removeItem("token");
-
-      return (
-        <Navigate
-          to={`/login?message=${encodeURIComponent(
-            "Access denied. Admin privileges required."
-          )}`}
-          replace
-        />
-      );
+      const redirectUrl = encodeURIComponent(window.location.href);
+      window.location.href = `https://www.vikashtechsolution.com/login?redirect=${redirectUrl}`;
+      return null;
     }
 
-    // ✅ Valid admin token → grant access
+    // ✅ Token valid and admin
     return children;
-  } catch (err) {
-    console.error("JWT validation failed:", err);
+  } catch (error) {
+    console.error("JWT validation failed:", error);
     Cookies.remove("token");
     sessionStorage.removeItem("token");
-
-    return (
-      <Navigate
-        to={`/login?message=${encodeURIComponent("Session expired. Please login again.")}`}
-        replace
-      />
-    );
+    const redirectUrl = encodeURIComponent(window.location.href);
+    window.location.href = `https://www.vikashtechsolution.com/login?redirect=${redirectUrl}`;
+    return null;
   }
 };
 
