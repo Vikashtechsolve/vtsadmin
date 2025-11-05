@@ -1,34 +1,44 @@
-// src/components/ProtectedRoute.jsx
 import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 
+/**
+ * ✅ Protects all pages. Redirects to /login if:
+ * - No token found
+ * - Token invalid
+ * - Role !== 'admin'
+ */
 const ProtectedRoute = ({ children }) => {
   const location = useLocation();
-  const token =
-    Cookies.get("token") || sessionStorage.getItem("token") || null;
-
-  if (!token) {
-    return (
-      <Navigate
-        to={`/login?message=${encodeURIComponent(
-          "Please login first to access the dashboard."
-        )}`}
-        state={{ from: location }}
-        replace
-      />
-    );
-  }
 
   try {
-    const decoded = jwtDecode(token);
+    // Check token in cookies or session
+    const token =
+      Cookies.get("token") || sessionStorage.getItem("token");
 
-    // Ensure only admins can access
-    if (decoded.role !== "admin") {
+    if (!token) {
+      // 🚫 No token — force login
       return (
         <Navigate
-          to={`/unauthorized?message=${encodeURIComponent(
+          to={`/login?message=${encodeURIComponent("Please login to continue.")}`}
+          state={{ from: location }}
+          replace
+        />
+      );
+    }
+
+    // Decode token
+    const decoded = jwtDecode(token);
+
+    if (!decoded || decoded.role !== "admin") {
+      // 🚫 Not admin or invalid token
+      Cookies.remove("token");
+      sessionStorage.removeItem("token");
+
+      return (
+        <Navigate
+          to={`/login?message=${encodeURIComponent(
             "Access denied. Admin privileges required."
           )}`}
           replace
@@ -36,18 +46,16 @@ const ProtectedRoute = ({ children }) => {
       );
     }
 
+    // ✅ Valid admin token → grant access
     return children;
-  } catch (error) {
-    console.error("Invalid token:", error);
-    // If decode fails, clear token and redirect to login
+  } catch (err) {
+    console.error("JWT validation failed:", err);
     Cookies.remove("token");
     sessionStorage.removeItem("token");
 
     return (
       <Navigate
-        to={`/login?message=${encodeURIComponent(
-          "Invalid or expired session. Please login again."
-        )}`}
+        to={`/login?message=${encodeURIComponent("Session expired. Please login again.")}`}
         replace
       />
     );
