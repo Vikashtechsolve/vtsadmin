@@ -58,8 +58,7 @@ function App() {
       <ScrollToTop />
       <Routes>
         {/* ✅ Public route */}
-        <Route path="/login" element={<LoginPage />} />
-
+        <Route path="/login" element={<Navigate to="https://www.vikashtechsolution.com/login" replace />} />
         {/* ✅ Protect the entire admin layout */}
         <Route
           element={

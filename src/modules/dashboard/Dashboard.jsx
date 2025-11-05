@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
+<<<<<<< HEAD
 import { useNavigate } from "react-router-dom";
+=======
+>>>>>>> 51811db (removed error)
 
 import DashboardHeader from "./DashboardHeader";
 import DashboardBanner from "./DashboardBanner";
@@ -24,12 +27,26 @@ const Dashboard = () => {
     // 🔐 Store token if it comes from URL (e.g., login redirect)
     if (tokenFromUrl) {
       try {
+<<<<<<< HEAD
         const decoded = jwtDecode(tokenFromUrl);
         if (decoded.role === "admin") {
           sessionStorage.setItem("token", tokenFromUrl);
           Cookies.set("token", tokenFromUrl, { secure: true, sameSite: "strict" });
         }
         // Clean URL (remove ?token=)
+=======
+        const decoded = jwtDecode(tokenFromUrl); // ✅ simpler
+
+        if (decoded.role === "admin") {
+          sessionStorage.setItem("token", tokenFromUrl);
+          Cookies.set("token", tokenFromUrl, {
+            secure: true,
+            sameSite: "strict",
+          });
+        }
+
+        // clean URL
+>>>>>>> 51811db (removed error)
         const cleanUrl = window.location.origin + window.location.pathname;
         window.history.replaceState({}, document.title, cleanUrl);
       } catch (err) {
@@ -37,6 +54,7 @@ const Dashboard = () => {
       }
     }
 
+<<<<<<< HEAD
     // ✅ Check for existing token in cookies or session
     const token = Cookies.get("token") || sessionStorage.getItem("token");
 
@@ -45,11 +63,19 @@ const Dashboard = () => {
         `/login?message=${encodeURIComponent("Please login to access the dashboard.")}`,
         { replace: true }
       );
+=======
+    const token = Cookies.get("token") || sessionStorage.getItem("token");
+    if (!token) {
+      window.location.href = `https://www.vikashtechsolution.com/login?redirect=${encodeURIComponent(
+        window.location.href
+      )}`;
+>>>>>>> 51811db (removed error)
       return;
     }
 
     try {
       const decoded = jwtDecode(token);
+<<<<<<< HEAD
       if (decoded.role !== "admin") {
         navigate(
           `/login?message=${encodeURIComponent("Access denied. Admin privileges required.")}`,
@@ -59,10 +85,33 @@ const Dashboard = () => {
       }
 
       // Mock loading dashboard data
+=======
+
+      // expiry check
+      if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+        Cookies.remove("token");
+        sessionStorage.removeItem("token");
+        window.location.href = `https://www.vikashtechsolution.com/login?redirect=${encodeURIComponent(
+          window.location.href
+        )}`;
+        return;
+      }
+
+      if (decoded.role !== "admin") {
+        Cookies.remove("token");
+        sessionStorage.removeItem("token");
+        window.location.href = `https://www.vikashtechsolution.com/login?redirect=${encodeURIComponent(
+          window.location.href
+        )}`;
+        return;
+      }
+
+>>>>>>> 51811db (removed error)
       setUser(dashboardData.user);
       setStats(dashboardData.stats);
       setActivities(dashboardData.activities);
       setLoading(false);
+<<<<<<< HEAD
     } catch (error) {
       console.error("Error decoding token:", error);
       Cookies.remove("token");
@@ -73,6 +122,17 @@ const Dashboard = () => {
       );
     }
   }, [navigate]);
+=======
+    } catch (err) {
+      console.error("JWT validation error:", err);
+      Cookies.remove("token");
+      sessionStorage.removeItem("token");
+      window.location.href = `https://www.vikashtechsolution.com/login?redirect=${encodeURIComponent(
+        window.location.href
+      )}`;
+    }
+  }, []);
+>>>>>>> 51811db (removed error)
 
   if (loading) {
     return (
@@ -93,7 +153,6 @@ const Dashboard = () => {
       <main className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         <section className="flex-1 overflow-y-auto p-4 sm:p-6">
           <DashboardBanner user={user} />
-
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mt-6">
             <DashboardCard title="Total Users" value={stats.totalUsers} />
             <DashboardCard title="Master Classes" value={stats.masterClasses} />
@@ -103,13 +162,11 @@ const Dashboard = () => {
             <DashboardCard title="Resume Review" value={stats.resumeReviews} />
           </div>
 
-          <div className="mt-10 pl-2 sm:pl-0">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-700 mb-3 ml-1 sm:ml-0">
+          <div className="mt-10">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-700 mb-3">
               Recent Activities
             </h2>
-            <div className="-ml-2 sm:-ml-1">
-              <ActivityList activities={activities} />
-            </div>
+            <ActivityList activities={activities} />
           </div>
         </section>
 
