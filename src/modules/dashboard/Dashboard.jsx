@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
-import jwtDecode from "jwt-decode";
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
+
 import DashboardHeader from "./DashboardHeader";
 import DashboardBanner from "./DashboardBanner";
 import DashboardCard from "./DashboardCard";
@@ -8,6 +11,7 @@ import DashboardRightPanel from "./DashboardRightPanel";
 import dashboardData from "./dashboardData.json";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [user, setUser] = useState({});
   const [stats, setStats] = useState({});
   const [activities, setActivities] = useState([]);
@@ -17,29 +21,58 @@ const Dashboard = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const tokenFromUrl = urlParams.get("token");
 
+    // 🔐 Store token if it comes from URL (e.g., login redirect)
     if (tokenFromUrl) {
       try {
         const decoded = jwtDecode(tokenFromUrl);
-
-        // ✅ Store valid admin token for this session
         if (decoded.role === "admin") {
           sessionStorage.setItem("token", tokenFromUrl);
+          Cookies.set("token", tokenFromUrl, { secure: true, sameSite: "strict" });
         }
-
-        // 🧹 Clean up URL (remove ?token=)
+        // Clean URL (remove ?token=)
         const cleanUrl = window.location.origin + window.location.pathname;
         window.history.replaceState({}, document.title, cleanUrl);
       } catch (err) {
-        console.error("Invalid token from URL:", err);
+        console.error("Invalid token in URL:", err);
       }
     }
 
-    // Load your dashboard data
-    setUser(dashboardData.user);
-    setStats(dashboardData.stats);
-    setActivities(dashboardData.activities);
-    setLoading(false);
-  }, []);
+    // ✅ Check for existing token in cookies or session
+    const token = Cookies.get("token") || sessionStorage.getItem("token");
+
+    if (!token) {
+      navigate(
+        `/login?message=${encodeURIComponent("Please login to access the dashboard.")}`,
+        { replace: true }
+      );
+      return;
+    }
+
+    try {
+      const decoded = jwtDecode(token);
+      if (decoded.role !== "admin") {
+        navigate(
+          `/login?message=${encodeURIComponent("Access denied. Admin privileges required.")}`,
+          { replace: true }
+        );
+        return;
+      }
+
+      // Mock loading dashboard data
+      setUser(dashboardData.user);
+      setStats(dashboardData.stats);
+      setActivities(dashboardData.activities);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      Cookies.remove("token");
+      sessionStorage.removeItem("token");
+      navigate(
+        `/login?message=${encodeURIComponent("Session expired. Please login again.")}`,
+        { replace: true }
+      );
+    }
+  }, [navigate]);
 
   if (loading) {
     return (
@@ -51,10 +84,12 @@ const Dashboard = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 text-gray-800 overflow-hidden">
+      {/* Header */}
       <div className="px-4 sm:px-6 lg:px-8 py-4 border-b border-gray-200 bg-white shadow-sm sticky top-0 z-10">
         <DashboardHeader user={user} />
       </div>
 
+      {/* Main Layout */}
       <main className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         <section className="flex-1 overflow-y-auto p-4 sm:p-6">
           <DashboardBanner user={user} />
@@ -78,6 +113,7 @@ const Dashboard = () => {
           </div>
         </section>
 
+        {/* Right Sidebar */}
         <aside className="w-full lg:w-96 bg-white border-t lg:border-t-0 lg:border-l border-gray-200 p-4 sm:p-6 shadow-inner overflow-y-auto">
           <DashboardRightPanel user={user} activities={activities} />
         </aside>
