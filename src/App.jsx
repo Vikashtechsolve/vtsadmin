@@ -9,8 +9,6 @@ import {
 
 import ScrollToTop from "./components/ScrollToTop";
 import Sidebar from "./components/Sidebar";
-
-// 🛡 Import ProtectedRoute
 import ProtectedRoute from "./components/ProtectedRoute";
 
 // Pages
@@ -22,13 +20,20 @@ import Blogs from "./pages/Blogs";
 import Settings from "./pages/Settings";
 import MasterClasses from "./pages/MasterClasses";
 
+/**
+ * AppLayout: shared layout with sidebar and top bar
+ */
 const AppLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="flex w-screen h-screen bg-gray-100 overflow-hidden">
+      {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+      {/* Main Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Mobile header */}
         <header className="md:hidden flex items-center justify-between bg-white p-4 shadow-sm">
           <button
             onClick={() => setSidebarOpen(true)}
@@ -38,6 +43,8 @@ const AppLayout = () => {
           </button>
           <h1 className="text-xl font-semibold text-red-600">VTS</h1>
         </header>
+
+        {/* Dynamic outlet */}
         <main className="flex-1 overflow-y-auto">
           <Outlet />
         </main>
@@ -46,15 +53,19 @@ const AppLayout = () => {
   );
 };
 
+/**
+ * Root App Component
+ */
 function App() {
   return (
     <Router>
       <ScrollToTop />
       <Routes>
+        {/* Shared Layout */}
         <Route element={<AppLayout />}>
-          {/* 🔒 Protect all admin routes */}
+          {/* ✅ Protected Routes */}
           <Route
-            path="/"
+            index
             element={
               <ProtectedRoute>
                 <Dashboard />
@@ -101,7 +112,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/programs/master-classes"
             element={
@@ -119,7 +129,7 @@ function App() {
             }
           />
 
-          {/* Fallback */}
+          {/* Fallback route */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

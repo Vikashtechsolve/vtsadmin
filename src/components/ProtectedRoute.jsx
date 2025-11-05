@@ -2,33 +2,43 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 import jwtDecode from "jwt-decode";
 
-/**
- * ProtectedRoute
- * Wraps around pages that require admin JWT auth.
- */
 const ProtectedRoute = ({ children }) => {
   try {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get("token") || localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
-    // 🔒 No token → go to login
-    if (!token) return <Navigate to="https://www.vikashtechsolution.com/login" replace />;
+    // 🔒 No token? go back to login
+    if (!token)
+      return (
+        <Navigate
+          to="https://www.vikashtechsolution.com/login"
+          replace
+        />
+      );
 
     const decoded = jwtDecode(token);
 
-    // 🚫 Not admin → clear and go to login
-    if (decoded.role !== "admin") {
-      localStorage.removeItem("token");
-      return <Navigate to="https://www.vikashtechsolution.com/login" replace />;
+    // 🚫 Not admin or expired
+    const now = Date.now() / 1000;
+    if (decoded.role !== "admin" || decoded.exp < now) {
+      sessionStorage.removeItem("token");
+      return (
+        <Navigate
+          to="https://www.vikashtechsolution.com/login"
+          replace
+        />
+      );
     }
 
-    // ✅ Store token for later API calls
-    localStorage.setItem("token", token);
     return children;
   } catch (err) {
-    console.error("Invalid or expired token:", err);
-    localStorage.removeItem("token");
-    return <Navigate to="https://www.vikashtechsolution.com/login" replace />;
+    console.error("❌ Invalid or expired token:", err);
+    sessionStorage.removeItem("token");
+    return (
+      <Navigate
+        to="https://www.vikashtechsolution.com/login"
+        replace
+      />
+    );
   }
 };
 

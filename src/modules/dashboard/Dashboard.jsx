@@ -15,52 +15,30 @@ const Dashboard = () => {
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get("token") || localStorage.getItem("token");
+    const tokenFromUrl = urlParams.get("token");
 
-    // 🔒 Redirect immediately if no token
-    if (!token) {
-      window.location.href = "https://www.vikashtechsolution.com/login";
-      return;
-    }
+    if (tokenFromUrl) {
+      try {
+        const decoded = jwtDecode(tokenFromUrl);
 
-    try {
-      const decoded = jwtDecode(token);
+        // ✅ Store valid admin token for this session
+        if (decoded.role === "admin") {
+          sessionStorage.setItem("token", tokenFromUrl);
+        }
 
-      // 🚫 If not an admin, redirect to login
-      if (decoded.role !== "admin") {
-        localStorage.removeItem("token");
-        window.location.href = "https://www.vikashtechsolution.com/login";
-        return;
+        // 🧹 Clean up URL (remove ?token=)
+        const cleanUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+      } catch (err) {
+        console.error("Invalid token from URL:", err);
       }
-
-      // ✅ Optional backend verification
-      // fetch("https://your-backend-url.com/api/auth/verify", {
-      //   headers: { Authorization: `Bearer ${token}` },
-      // })
-      //   .then((res) => {
-      //     if (!res.ok) throw new Error("Invalid token");
-      //     return res.json();
-      //   })
-      //   .then(() => {
-      //     localStorage.setItem("token", token);
-      //     loadDashboardData();
-      //   })
-      //   .catch(() => {
-      //     localStorage.removeItem("token");
-      //     window.location.href = "https://www.vikashtechsolution.com/login";
-      //   });
-
-      // ✅ For now: Load mock data
-      localStorage.setItem("token", token);
-      setUser(dashboardData.user);
-      setStats(dashboardData.stats);
-      setActivities(dashboardData.activities);
-      setLoading(false);
-    } catch (err) {
-      console.error("❌ Invalid token:", err);
-      localStorage.removeItem("token");
-      window.location.href = "https://www.vikashtechsolution.com/login";
     }
+
+    // Load your dashboard data
+    setUser(dashboardData.user);
+    setStats(dashboardData.stats);
+    setActivities(dashboardData.activities);
+    setLoading(false);
   }, []);
 
   if (loading) {
@@ -71,21 +49,16 @@ const Dashboard = () => {
     );
   }
 
-  // ✅ Render dashboard only when token is valid and admin
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 text-gray-800 overflow-hidden">
-      {/* Header */}
       <div className="px-4 sm:px-6 lg:px-8 py-4 border-b border-gray-200 bg-white shadow-sm sticky top-0 z-10">
         <DashboardHeader user={user} />
       </div>
 
-      {/* Main Content */}
       <main className="flex-1 flex flex-col lg:flex-row overflow-hidden">
-        {/* LEFT SECTION */}
         <section className="flex-1 overflow-y-auto p-4 sm:p-6">
           <DashboardBanner user={user} />
 
-          {/* Stats Cards */}
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mt-6">
             <DashboardCard title="Total Users" value={stats.totalUsers} />
             <DashboardCard title="Master Classes" value={stats.masterClasses} />
@@ -95,7 +68,6 @@ const Dashboard = () => {
             <DashboardCard title="Resume Review" value={stats.resumeReviews} />
           </div>
 
-          {/* Activity List */}
           <div className="mt-10 pl-2 sm:pl-0">
             <h2 className="text-lg sm:text-xl font-semibold text-gray-700 mb-3 ml-1 sm:ml-0">
               Recent Activities
@@ -106,7 +78,6 @@ const Dashboard = () => {
           </div>
         </section>
 
-        {/* RIGHT PANEL */}
         <aside className="w-full lg:w-96 bg-white border-t lg:border-t-0 lg:border-l border-gray-200 p-4 sm:p-6 shadow-inner overflow-y-auto">
           <DashboardRightPanel user={user} activities={activities} />
         </aside>
