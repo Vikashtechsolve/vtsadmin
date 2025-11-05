@@ -20,9 +20,6 @@ import Blogs from "./pages/Blogs";
 import Settings from "./pages/Settings";
 import MasterClasses from "./pages/MasterClasses";
 
-/**
- * Shared layout (sidebar + content)
- */
 const AppLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -30,7 +27,6 @@ const AppLayout = () => {
     <div className="flex w-screen h-screen bg-gray-100 overflow-hidden">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Mobile header */}
         <header className="md:hidden flex items-center justify-between bg-white p-4 shadow-sm">
           <button
             onClick={() => setSidebarOpen(true)}
@@ -38,7 +34,7 @@ const AppLayout = () => {
           >
             ☰
           </button>
-          <h1 className="text-xl font-semibold text-red-600">VTS</h1>
+          <h1 className="text-xl font-semibold text-red-600">VTS Admin</h1>
         </header>
         <main className="flex-1 overflow-y-auto">
           <Outlet />
@@ -48,17 +44,18 @@ const AppLayout = () => {
   );
 };
 
-/**
- * Root App Component
- */
 function App() {
   return (
     <Router>
       <ScrollToTop />
       <Routes>
-        {/* ✅ Public route */}
-        <Route path="/login" element={<Navigate to="https://www.vikashtechsolution.com/login" replace />} />
-        {/* ✅ Protect the entire admin layout */}
+        {/* Public Redirect to Main Login */}
+        <Route
+          path="/login"
+          element={<Navigate to="https://www.vikashtechsolution.com/login" replace />}
+        />
+
+        {/* Protected Admin Area */}
         <Route
           element={
             <ProtectedRoute>
@@ -79,7 +76,7 @@ function App() {
           />
         </Route>
 
-        {/* Fallback route */}
+        {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
