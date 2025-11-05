@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 import DashboardHeader from "./DashboardHeader";
 import DashboardBanner from "./DashboardBanner";
@@ -20,28 +21,23 @@ const Dashboard = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const tokenFromUrl = urlParams.get("token");
 
-    // 🔐 Store token if it comes from URL (e.g., login redirect)
+    // 🧩 If token comes via URL (after login)
     if (tokenFromUrl) {
       try {
-        const decoded = jwtDecode(tokenFromUrl); // ✅ simpler
-
+        const decoded = jwtDecode(tokenFromUrl);
         if (decoded.role === "admin") {
           sessionStorage.setItem("token", tokenFromUrl);
-          Cookies.set("token", tokenFromUrl, {
-            secure: true,
-            sameSite: "strict",
-          });
+          Cookies.set("token", tokenFromUrl, { secure: true, sameSite: "strict" });
         }
-
-        // clean URL
-        const cleanUrl = window.location.origin + window.location.pathname;
-        window.history.replaceState({}, document.title, cleanUrl);
+        // Clean URL
+        window.history.replaceState({}, document.title, window.location.origin);
       } catch (err) {
-        console.error("Invalid token in URL:", err);
+        console.error("Invalid token from URL:", err);
       }
     }
 
     const token = Cookies.get("token") || sessionStorage.getItem("token");
+
     if (!token) {
       window.location.href = `https://www.vikashtechsolution.com/login?redirect=${encodeURIComponent(
         window.location.href
@@ -52,7 +48,6 @@ const Dashboard = () => {
     try {
       const decoded = jwtDecode(token);
 
-      // expiry check
       if (decoded.exp && decoded.exp * 1000 < Date.now()) {
         Cookies.remove("token");
         sessionStorage.removeItem("token");
@@ -71,6 +66,7 @@ const Dashboard = () => {
         return;
       }
 
+      // ✅ Load mock data (or your API)
       setUser(dashboardData.user);
       setStats(dashboardData.stats);
       setActivities(dashboardData.activities);
@@ -86,11 +82,7 @@ const Dashboard = () => {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen text-gray-600">
-        Loading dashboard...
-      </div>
-    );
+    return <div className="flex items-center justify-center h-screen text-gray-600">Loading dashboard...</div>;
   }
 
   return (
@@ -100,11 +92,11 @@ const Dashboard = () => {
         <DashboardHeader user={user} />
       </div>
 
-      {/* Main Layout */}
+      {/* Content */}
       <main className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         <section className="flex-1 overflow-y-auto p-4 sm:p-6">
           <DashboardBanner user={user} />
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mt-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mt-6">
             <DashboardCard title="Total Users" value={stats.totalUsers} />
             <DashboardCard title="Master Classes" value={stats.masterClasses} />
             <DashboardCard title="Mentor Sessions" value={stats.mentorSessions} />
@@ -114,15 +106,12 @@ const Dashboard = () => {
           </div>
 
           <div className="mt-10">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-700 mb-3">
-              Recent Activities
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-700 mb-3">Recent Activities</h2>
             <ActivityList activities={activities} />
           </div>
         </section>
 
-        {/* Right Sidebar */}
-        <aside className="w-full lg:w-96 bg-white border-t lg:border-t-0 lg:border-l border-gray-200 p-4 sm:p-6 shadow-inner overflow-y-auto">
+        <aside className="w-full lg:w-96 bg-white border-l border-gray-200 p-6 shadow-inner overflow-y-auto">
           <DashboardRightPanel user={user} activities={activities} />
         </aside>
       </main>
