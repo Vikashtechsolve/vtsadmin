@@ -1,3 +1,4 @@
+// src/App.jsx
 import React, { useState } from "react";
 import {
   BrowserRouter as Router,
@@ -11,7 +12,6 @@ import ScrollToTop from "./components/ScrollToTop";
 import Sidebar from "./components/Sidebar";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-// Pages
 import Dashboard from "./modules/dashboard/Dashboard";
 import Programs from "./pages/Programs";
 import Products from "./pages/Products";
@@ -19,10 +19,11 @@ import About from "./pages/About";
 import Blogs from "./pages/Blogs";
 import Settings from "./pages/Settings";
 import MasterClasses from "./pages/MasterClasses";
+import LoginPage from "./pages/LoginPage";
+import Unauthorized from "./pages/Unauthorized";
 
 const AppLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
   return (
     <div className="flex w-screen h-screen bg-gray-100 overflow-hidden">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
@@ -49,35 +50,80 @@ function App() {
     <Router>
       <ScrollToTop />
       <Routes>
-        {/* Public Redirect to Main Login */}
-        <Route
-          path="/login"
-          element={<Navigate to="https://www.vikashtechsolution.com/login" replace />}
-        />
+        {/* 🔐 Public Routes */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/unauthorized" element={<Unauthorized />} />
 
-        {/* Protected Admin Area */}
-        <Route
-          element={
-            <ProtectedRoute>
-              <AppLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<Dashboard />} />
-          <Route path="/programs" element={<Programs />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/blogs" element={<Blogs />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/programs/master-classes" element={<MasterClasses />} />
+        {/* 🧩 Protected Admin Layout */}
+        <Route element={<AppLayout />}>
+          <Route
+            index
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/programs"
+            element={
+              <ProtectedRoute>
+                <Programs />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/products"
+            element={
+              <ProtectedRoute>
+                <Products />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/about"
+            element={
+              <ProtectedRoute>
+                <About />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/blogs"
+            element={
+              <ProtectedRoute>
+                <Blogs />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/programs/master-classes"
+            element={
+              <ProtectedRoute>
+                <MasterClasses />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/programs/master-classes/view/:id"
-            element={<MasterClasses />}
+            element={
+              <ProtectedRoute>
+                <MasterClasses />
+              </ProtectedRoute>
+            }
           />
-        </Route>
 
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
       </Routes>
     </Router>
   );
