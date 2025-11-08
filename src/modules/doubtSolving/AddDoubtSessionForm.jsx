@@ -1,19 +1,17 @@
 import React, { useState } from "react";
-import { X, Clock, CalendarDays } from "lucide-react";
+import { X, CalendarDays } from "lucide-react";
 
 const AddDoubtSessionForm = ({ isOpen, onClose, onSubmit }) => {
   const [form, setForm] = useState({
-    student: "",
-    mentor: "",
     subject: "",
+    topic: "",
+    mentor: "",
+    doubt: "",
+    status: "Live",
     date: "",
-    time: "",
-    plan: "Quick mentor",
-    doubts: "",
-    status: "Scheduled",
   });
 
-  const update = (k, v) => setForm((p) => ({ ...p, [k]: v }));
+  const update = (key, value) => setForm((p) => ({ ...p, [key]: value }));
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -30,10 +28,10 @@ const AddDoubtSessionForm = ({ isOpen, onClose, onSubmit }) => {
         <div className="flex items-center justify-between px-6 py-4 border-b">
           <div>
             <h2 className="text-xl font-semibold text-gray-800">
-              Add Doubt Solving Session
+              Student Doubt Details
             </h2>
             <p className="text-sm text-gray-500">
-              Enter details to schedule a new session
+              Fill in the details to record the student’s doubt session
             </p>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
@@ -41,110 +39,111 @@ const AddDoubtSessionForm = ({ isOpen, onClose, onSubmit }) => {
           </button>
         </div>
 
+        {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">
-                Student Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                value={form.student}
-                onChange={(e) => update("student", e.target.value)}
-                className="input"
-                placeholder="e.g., Ananya Sharma"
-              />
-            </div>
+          {/* Subject */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Subject <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              required
+              value={form.subject}
+              onChange={(e) => update("subject", e.target.value)}
+              className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-red-200 focus:outline-none"
+              placeholder="Mathematics"
+            />
+          </div>
 
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">
-                Mentor Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                value={form.mentor}
-                onChange={(e) => update("mentor", e.target.value)}
-                className="input"
-                placeholder="e.g., Arjun Mehta"
-              />
-            </div>
+          {/* Topic */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Topic <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              required
+              value={form.topic}
+              onChange={(e) => update("topic", e.target.value)}
+              className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-red-200 focus:outline-none"
+              placeholder="Integration"
+            />
+          </div>
 
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">
-                Subject <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                value={form.subject}
-                onChange={(e) => update("subject", e.target.value)}
-                className="input"
-                placeholder="e.g., DSA"
-              />
-            </div>
+          {/* Mentor */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Mentor Name <span className="text-red-500">*</span>
+            </label>
+            <select
+              required
+              value={form.mentor}
+              onChange={(e) => update("mentor", e.target.value)}
+              className="w-full px-4 py-2 rounded-lg border border-gray-200 bg-white focus:ring-2 focus:ring-red-200 focus:outline-none"
+            >
+              <option value="">Select mentor</option>
+              <option>Akash Rajput</option>
+              <option>Priya Chauhan</option>
+              <option>Meera Jain</option>
+              <option>Arjun Mehta</option>
+            </select>
+          </div>
 
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">
-                Plan <span className="text-red-500">*</span>
-              </label>
-              <select
-                className="input"
-                value={form.plan}
-                onChange={(e) => update("plan", e.target.value)}
-              >
-                <option>Quick mentor</option>
-                <option>Deep learning</option>
-                <option>Premium mentor</option>
-              </select>
-            </div>
+          {/* Doubt */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Doubt <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              required
+              rows={4}
+              value={form.doubt}
+              onChange={(e) => update("doubt", e.target.value)}
+              placeholder='“I am having trouble understanding how to solve ∫(2x² + 3x + 1) dx. Can you please explain the step-by-step process and constant of integration?”'
+              className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-red-200 focus:outline-none resize-none"
+            />
+          </div>
 
+          {/* Status */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Status <span className="text-red-500">*</span>
+            </label>
+            <select
+              required
+              value={form.status}
+              onChange={(e) => update("status", e.target.value)}
+              className="w-full px-4 py-2 rounded-lg border border-gray-200 bg-white focus:ring-2 focus:ring-red-200 focus:outline-none"
+            >
+              <option>Live</option>
+              <option>Pending</option>
+              <option>Completed</option>
+              <option>Scheduled</option>
+            </select>
+          </div>
+
+          {/* Date */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Doubt Raised on <span className="text-red-500">*</span>
+            </label>
             <div className="relative">
               <CalendarDays
                 size={16}
-                className="absolute left-3 top-9 text-gray-400"
+                className="absolute left-3 top-3 text-gray-400"
               />
-              <label className="text-sm font-medium text-gray-700 mb-1 block">
-                Date <span className="text-red-500">*</span>
-              </label>
               <input
                 type="date"
                 required
                 value={form.date}
                 onChange={(e) => update("date", e.target.value)}
-                className="input pl-9"
-              />
-            </div>
-
-            <div className="relative">
-              <Clock size={16} className="absolute left-3 top-9 text-gray-400" />
-              <label className="text-sm font-medium text-gray-700 mb-1 block">
-                Time <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="time"
-                required
-                value={form.time}
-                onChange={(e) => update("time", e.target.value)}
-                className="input pl-9"
+                className="w-full pl-9 pr-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-red-200 focus:outline-none"
               />
             </div>
           </div>
 
-          <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 block">
-              Doubt Details
-            </label>
-            <textarea
-              rows={3}
-              value={form.doubts}
-              onChange={(e) => update("doubts", e.target.value)}
-              className="input"
-              placeholder="e.g., Confusion in recursion problem"
-            />
-          </div>
-
+          {/* Footer Buttons */}
           <div className="flex justify-between pt-4 border-t mt-6">
             <button
               type="button"
@@ -157,16 +156,10 @@ const AddDoubtSessionForm = ({ isOpen, onClose, onSubmit }) => {
               type="submit"
               className="px-5 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600"
             >
-              Save Session
+              Save Details
             </button>
           </div>
         </form>
-
-        <style>{`
-          .input {
-            @apply w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-red-200 focus:outline-none;
-          }
-        `}</style>
       </div>
     </div>
   );

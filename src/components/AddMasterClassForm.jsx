@@ -1,171 +1,185 @@
+// src/components/AddMasterClassForm.jsx
 import React, { useState } from "react";
-import { X, CalendarDays } from "lucide-react";
 
-const AddDoubtSessionForm = ({ isOpen, onClose, onSubmit }) => {
-  const [form, setForm] = useState({
-    subject: "",
-    topic: "",
+const AddMasterClassForm = ({ isOpen, onClose, onSubmit }) => {
+  const [formData, setFormData] = useState({
+    title: "",
+    subtitle: "",
     mentor: "",
-    doubt: "",
-    status: "Live",
     date: "",
+    time: "",
+    status: "",
+    banner: null,
   });
 
-  const update = (key, value) => setForm((p) => ({ ...p, [key]: value }));
+  if (!isOpen) return null; // Hide modal when not open
+
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: files ? files[0] : value,
+    }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(form);
+    onSubmit(formData);
     onClose();
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white w-full max-w-lg rounded-3xl shadow-xl overflow-hidden animate-fadeIn">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 relative animate-fadeIn">
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-2xl"
+        >
+          ✕
+        </button>
+
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b">
-          <h2 className="text-xl font-semibold text-gray-800">
-            Student Doubt Details
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition"
-          >
-            <X size={22} />
-          </button>
-        </div>
+        <h2 className="text-xl sm:text-2xl font-semibold text-center mb-1">
+          Add New Master Class
+        </h2>
+        <p className="text-center text-gray-500 text-sm mb-6">
+          Fill in the details below to create a new upcoming event
+        </p>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          {/* Subject */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Event Title */}
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 block">
-              Subject <span className="text-red-500">*</span>
+            <label className="block text-sm font-medium mb-1">
+              Event Title <span className="text-red-500">*</span>
             </label>
             <input
+              name="title"
               type="text"
+              placeholder="Enter the masterclass title (e.g., Resume Review Workshop)"
+              value={formData.title}
+              onChange={handleChange}
+              className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-red-400 focus:outline-none"
               required
-              value={form.subject}
-              onChange={(e) => update("subject", e.target.value)}
-              placeholder="Mathematics"
-              className="input"
             />
           </div>
 
-          {/* Topic */}
+          {/* Event Subtitle */}
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 block">
-              Topic <span className="text-red-500">*</span>
+            <label className="block text-sm font-medium mb-1">
+              Event Subtitle <span className="text-red-500">*</span>
             </label>
             <input
+              name="subtitle"
               type="text"
+              placeholder="Enter event subtitle"
+              value={formData.subtitle}
+              onChange={handleChange}
+              className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-red-400 focus:outline-none"
               required
-              value={form.topic}
-              onChange={(e) => update("topic", e.target.value)}
-              placeholder="Integration"
-              className="input"
             />
           </div>
 
-          {/* Mentor */}
+          {/* Mentor Name */}
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 block">
+            <label className="block text-sm font-medium mb-1">
               Mentor Name <span className="text-red-500">*</span>
             </label>
-            <select
+            <input
+              name="mentor"
+              type="text"
+              placeholder="Enter mentor's full name"
+              value={formData.mentor}
+              onChange={handleChange}
+              className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-red-400 focus:outline-none"
               required
-              value={form.mentor}
-              onChange={(e) => update("mentor", e.target.value)}
-              className="input"
-            >
-              <option value="">Select mentor</option>
-              <option>Akash Rajput</option>
-              <option>Priya Chauhan</option>
-              <option>Meera Jain</option>
-              <option>Arjun Mehta</option>
-            </select>
+            />
           </div>
 
-          {/* Doubt */}
+          {/* Schedule Date */}
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 block">
-              Doubt <span className="text-red-500">*</span>
+            <label className="block text-sm font-medium mb-1">
+              Schedule Event Date <span className="text-red-500">*</span>
             </label>
-            <textarea
+            <input
+              name="date"
+              type="date"
+              value={formData.date}
+              onChange={handleChange}
+              className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-red-400 focus:outline-none"
               required
-              rows={4}
-              value={form.doubt}
-              onChange={(e) => update("doubt", e.target.value)}
-              placeholder='“I am having trouble understanding how to solve ∫(2x² + 3x + 1) dx. Can you please explain the step-by-step process and constant of integration?”'
-              className="input resize-none"
+            />
+          </div>
+
+          {/* Schedule Time */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Schedule Event Time <span className="text-red-500">*</span>
+            </label>
+            <input
+              name="time"
+              type="time"
+              value={formData.time}
+              onChange={handleChange}
+              className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-red-400 focus:outline-none"
+              required
+            />
+          </div>
+
+          {/* Upload Banner */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Upload Banner
+            </label>
+            <input
+              type="file"
+              name="banner"
+              accept="image/*"
+              onChange={handleChange}
+              className="block w-full text-sm text-gray-600 border border-gray-200 rounded-lg cursor-pointer bg-gray-50 p-2"
             />
           </div>
 
           {/* Status */}
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 block">
+            <label className="block text-sm font-medium mb-1">
               Status <span className="text-red-500">*</span>
             </label>
             <select
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-red-400 focus:outline-none"
               required
-              value={form.status}
-              onChange={(e) => update("status", e.target.value)}
-              className="input"
             >
-              <option>Live</option>
-              <option>Pending</option>
-              <option>Completed</option>
-              <option>Scheduled</option>
+              <option value="">Select Status</option>
+              <option value="Upcoming">Upcoming</option>
+              <option value="Ongoing">Ongoing</option>
+              <option value="Completed">Completed</option>
             </select>
           </div>
 
-          {/* Date */}
-          <div className="relative">
-            <label className="text-sm font-medium text-gray-700 mb-1 block">
-              Doubt Raised on <span className="text-red-500">*</span>
-            </label>
-            <CalendarDays
-              size={16}
-              className="absolute left-3 top-9 text-gray-400"
-            />
-            <input
-              type="date"
-              required
-              value={form.date}
-              onChange={(e) => update("date", e.target.value)}
-              className="input pl-9"
-            />
-          </div>
-
           {/* Buttons */}
-          <div className="flex justify-between pt-6 border-t mt-6">
+          <div className="flex justify-between gap-4 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50"
+              className="w-1/2 py-2 rounded-lg border border-gray-300 bg-gray-100 hover:bg-gray-200 transition"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600"
+              className="w-1/2 py-2 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 transition"
             >
-              Save Details
+              Add Event
             </button>
           </div>
         </form>
-
-        {/* Tailwind Styles */}
-        <style>{`
-          .input {
-            @apply w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-red-200 focus:outline-none transition;
-          }
-        `}</style>
       </div>
     </div>
   );
 };
 
-export default AddDoubtSessionForm;
+export default AddMasterClassForm;
