@@ -5,8 +5,8 @@ import axios from "axios";
 
 /**
  * 🌍 Auto-detect API base URL
- * - Uses Render URL in production
- * - Uses localhost in local dev
+ * - Uses environment variable if defined
+ * - Falls back to localhost or production Render URL
  */
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
@@ -48,19 +48,32 @@ const LoginPage = () => {
     }
 
     try {
-      console.log("🌐 Using API:", `${API_BASE_URL}/api/auth/login`);
+      const loginUrl = `${API_BASE_URL}/api/auth/login`;
+      console.log("🌐 Using API:", loginUrl);
+
       const response = await axios.post(
-        `${API_BASE_URL}/api/auth/login`,
+        loginUrl,
         { username: username.trim(), password },
-        { withCredentials: true }
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+        }
       );
 
-      if (response.data?.token) {
+      console.log("✅ Server response:", response.data);
+
+      // Extract token and role safely
+      const token =
+        response.data?.token ||
+        response.data?.accessToken ||
+        response.data?.jwt;
+      const role = response.data?.user?.role;
+
+      if (token) {
         // ✅ Store JWT
-        sessionStorage.setItem("token", response.data.token);
+        sessionStorage.setItem("token", token);
 
         // 🧭 Redirect based on role
-        const role = response.data?.user?.role;
         startTransition(() => {
           if (role === "admin") {
             navigate("/");
@@ -70,15 +83,18 @@ const LoginPage = () => {
         });
       } else {
         setError("Unexpected response from server. Please try again.");
-        console.warn("⚠️ Unexpected response:", response.data);
+        console.warn("⚠️ Unexpected response format:", response.data);
       }
     } catch (err) {
       console.error("❌ Login error:", err);
 
       if (err.response) {
+        console.error("🔎 Backend Response:", err.response);
         setError(err.response.data?.message || "Invalid username or password");
       } else if (err.request) {
-        setError("No response from server. Please check your backend.");
+        setError(
+          "No response from server. Please check if backend is running and CORS is configured."
+        );
       } else {
         setError("Something went wrong while sending your request.");
       }
