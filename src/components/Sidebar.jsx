@@ -34,7 +34,7 @@ const Sidebar = ({ isOpen = false, onClose }) => {
         { name: "Mentorship", path: "/programs/mentorship" },
         { name: "Online Contests", path: "/programs/online-contests" },
         { name: "Resume Review & Roadmap", path: "/programs/resume-review" },
-        { name: "Live Doubt Solving", path: "/programs/live-doubt" },
+        { name: "Live Doubt Solving", path: "/programs/doubt-solving" },
       ],
     },
     {

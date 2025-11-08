@@ -1,0 +1,65 @@
+{
+  "sessions": [
+    {
+      "date": "October 28, 2025",
+      "details": [
+        {
+          "id": 1,
+          "student": "Ananya Sharma",
+          "mentor": "Arjun Mehta",
+          "subject": "Maths",
+          "time": "4:00 PM",
+          "plan": "Deep learning",
+          "doubts": "Integration problem",
+          "status": "Live",
+          "registration": [
+            { "name": "Riya S.", "email": "riyas@example.com", "mobile": "9876543210", "graduationYear": "2026", "status": "Confirmed" }
+          ]
+        },
+        {
+          "id": 2,
+          "student": "Arjun Singh",
+          "mentor": "Meera Jain",
+          "subject": "DSA",
+          "time": "5:30 PM",
+          "plan": "Quick mentor",
+          "doubts": "Binary trees",
+          "status": "Completed"
+        }
+      ]
+    },
+    {
+      "date": "November 1, 2025",
+      "details": [
+        {
+          "id": 3,
+          "student": "Neha Verma",
+          "mentor": "Priya Chauhan",
+          "subject": "Data Science",
+          "time": "1:30 PM",
+          "plan": "Deep learning",
+          "doubts": "Regression confusion",
+          "status": "Scheduled"
+        },
+        {
+          "id": 4,
+          "student": "Ritik Verma",
+          "mentor": "Akash Rajput",
+          "subject": "Web development",
+          "time": "6:30 PM",
+          "plan": "Premium mentor",
+          "doubts": "Auth + JWT",
+          "status": "Pending"
+        }
+      ]
+    }
+  ],
+  "highlights": [
+    { "title": "New mentor Arjun Jain added to DSA section.", "date": "Oct 28, 2025", "time": "3:00 PM" },
+    { "title": "Session rescheduled by Ankit Sharma (Student).", "date": "Oct 28, 2025", "time": "2:30 PM" }
+  ],
+  "mentors": [
+    { "name": "Ankit Verma", "role": "Full Stack Developer", "rating": 4.8 },
+    { "name": "Shreya Patel", "role": "Java Developer", "rating": 4.9 }
+  ]
+}
