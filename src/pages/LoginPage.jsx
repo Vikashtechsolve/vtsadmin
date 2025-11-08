@@ -12,7 +12,7 @@ const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
   (window.location.hostname === "localhost"
     ? "http://localhost:8000"
-    : "https://vts-backend-ms7k.onrender.com");
+    : "https://vts-backend-ms7k.onrender.com"); 
 
 const LoginPage = () => {
   const navigate = useNavigate();
