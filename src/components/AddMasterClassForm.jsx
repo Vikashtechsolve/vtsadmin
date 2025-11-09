@@ -8,12 +8,14 @@ const AddMasterClassForm = ({ isOpen, onClose, onSubmit }) => {
     mentor: "",
     date: "",
     time: "",
-    status: "",
     banner: null,
+    meetingurl: "",
   });
+  const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null; // Hide modal when not open
 
+  // ✅ Handle Input Changes
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     setFormData((prev) => ({
@@ -22,18 +24,55 @@ const AddMasterClassForm = ({ isOpen, onClose, onSubmit }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  // ✅ Handle Form Submission
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(formData);
-    onClose();
+
+    try {
+      setLoading(true);
+      const apiUrl = `${import.meta.env.VITE_API_URL}/api/masterclass`;
+
+      // Prepare FormData for multipart upload
+      const formPayload = new FormData();
+      formPayload.append("eventTitle", formData.title);
+      formPayload.append("eventSubtitle", formData.subtitle);
+      formPayload.append("mentorName", formData.mentor);
+      formPayload.append("scheduleEventDate", formData.date);
+      formPayload.append("scheduleEventTime", formData.time);
+      formPayload.append("meetingUrl", formData.meetingurl);
+      if (formData.banner instanceof File) {
+        formPayload.append("bannerImage", formData.banner);
+      }
+
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        body: formPayload,
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert("✅ Masterclass added successfully!");
+        if (onSubmit) onSubmit(result);
+        onClose();
+      } else {
+        alert(`❌ Error: ${result.message || "Something went wrong"}`);
+      }
+    } catch (error) {
+      console.error("Error adding masterclass:", error);
+      alert("❌ Failed to add masterclass. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 relative animate-fadeIn">
-        {/* Close button */}
+        {/* Close Button */}
         <button
           onClick={onClose}
+          disabled={loading}
           className="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-2xl"
         >
           ✕
@@ -57,7 +96,7 @@ const AddMasterClassForm = ({ isOpen, onClose, onSubmit }) => {
             <input
               name="title"
               type="text"
-              placeholder="Enter the masterclass title (e.g., Resume Review Workshop)"
+              placeholder="Enter the masterclass title"
               value={formData.title}
               onChange={handleChange}
               className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-red-400 focus:outline-none"
@@ -127,10 +166,26 @@ const AddMasterClassForm = ({ isOpen, onClose, onSubmit }) => {
             />
           </div>
 
+          {/* Meeting URL */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Meeting URL <span className="text-red-500">*</span>
+            </label>
+            <input
+              name="meetingurl"
+              type="url"
+              placeholder="Enter meeting URL"
+              value={formData.meetingurl}
+              onChange={handleChange}
+              className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-red-400 focus:outline-none"
+              required
+            />
+          </div>
+
           {/* Upload Banner */}
           <div>
             <label className="block text-sm font-medium mb-1">
-              Upload Banner
+              Upload Banner <span className="text-red-500">*</span>
             </label>
             <input
               type="file"
@@ -138,26 +193,8 @@ const AddMasterClassForm = ({ isOpen, onClose, onSubmit }) => {
               accept="image/*"
               onChange={handleChange}
               className="block w-full text-sm text-gray-600 border border-gray-200 rounded-lg cursor-pointer bg-gray-50 p-2"
-            />
-          </div>
-
-          {/* Status */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Status <span className="text-red-500">*</span>
-            </label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-red-400 focus:outline-none"
               required
-            >
-              <option value="">Select Status</option>
-              <option value="Upcoming">Upcoming</option>
-              <option value="Ongoing">Ongoing</option>
-              <option value="Completed">Completed</option>
-            </select>
+            />
           </div>
 
           {/* Buttons */}
@@ -165,15 +202,29 @@ const AddMasterClassForm = ({ isOpen, onClose, onSubmit }) => {
             <button
               type="button"
               onClick={onClose}
+              disabled={loading}
               className="w-1/2 py-2 rounded-lg border border-gray-300 bg-gray-100 hover:bg-gray-200 transition"
             >
               Cancel
             </button>
+
             <button
               type="submit"
-              className="w-1/2 py-2 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 transition"
+              disabled={loading}
+              className={`w-1/2 py-2 rounded-lg font-medium text-white transition ${
+                loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-red-600 hover:bg-red-700"
+              }`}
             >
-              Add Event
+              {loading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                  Adding...
+                </div>
+              ) : (
+                "Add Event"
+              )}
             </button>
           </div>
         </form>
