@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "react-calendar/dist/Calendar.css";
-import localData from "../data/masterClassData.json";
 
 import MasterClassDashboard from "../components/MasterClassDashboard";
 import MasterClassDetails from "../components/MasterClassDetails";
@@ -14,73 +13,72 @@ const MasterClasses = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [data, setData] = useState(null);
+  const [data, setData] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showForm, setShowForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [editData, setEditData] = useState(null);
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [pastEvents, setPastEvents] = useState([]);
 
-  // ✅ Load JSON Data
+  // ✅ Load Masterclass Data
   useEffect(() => {
     const loadData = async () => {
       try {
-        const response = await fetch("/data/masterClassData.json");
-        if (response.ok) {
-          const json = await response.json();
-          setData(json);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/masterclass`);
+        const result = await res.json();
+
+        if (result.success && Array.isArray(result.data)) {
+          setData(result.data);
+
+          const upcoming = result.data.filter((e) => e.status === "scheduled");
+          const past = result.data.filter(
+            (e) => e.status === "completed" || e.status === "cancelled"
+          );
+
+          setUpcomingEvents(upcoming);
+          setPastEvents(past);
         } else {
-          setData(localData);
+          console.error("Invalid API response:", result);
         }
-      } catch {
-        setData(localData);
+      } catch (err) {
+        console.error("Error fetching masterclasses:", err);
       }
     };
+
     loadData();
   }, []);
 
-  // ✅ Add Event Handler
+  // ✅ Add New Event
   const handleAddEvent = (newEvent) => {
-    setData((prev) => ({
-      ...prev,
-      upcomingEvents: [...prev.upcomingEvents, newEvent],
-    }));
+    setUpcomingEvents((prev) => [...prev, newEvent]);
   };
 
-  // ✅ Edit Event Handler
+  // ✅ Save Edited Event
   const handleSaveEdit = (updatedEvent) => {
-    setData((prev) => ({
-      ...prev,
-      upcomingEvents: prev.upcomingEvents.map((e) =>
-        e.id === updatedEvent.id ? updatedEvent : e
-      ),
-    }));
+    setUpcomingEvents((prev) =>
+      prev.map((e) => (e._id === updatedEvent._id ? updatedEvent : e))
+    );
   };
 
-  if (!data)
+  if (!data.length)
     return (
       <div className="flex justify-center items-center min-h-screen text-gray-600">
         Loading Master Classes...
       </div>
     );
 
-  // ✅ Find event if we're in "view mode"
-  const event =
-    id &&
-    (data.upcomingEvents.find((e) => e.id === parseInt(id)) ||
-      data.pastEvents.find((e) => e.id === parseInt(id)));
-
+  // ✅ Render Dashboard or Details
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-50">
       <div className="flex-1 p-6 lg:p-10">
-        {/* ✅ Conditional view: Dashboard or Single Event */}
         {!id ? (
           <>
-            {/* Top Intro Card */}
             <MasterClassIntroCard />
-
-            {/* Dashboard Section */}
             <MasterClassDashboard
               data={data}
+              upcomingEvents={upcomingEvents}
+              pastEvents={pastEvents}
               onAddEvent={() => setShowForm(true)}
               onEditEvent={(event) => {
                 setEditData(event);
@@ -92,11 +90,11 @@ const MasterClasses = () => {
             />
           </>
         ) : (
-          <MasterClassDetails event={event} onBack={() => navigate(-1)} />
+          <MasterClassDetails onBack={() => navigate(-1)} />
         )}
       </div>
 
-      {/* Shared Right Panel */}
+      {/* Right Panel */}
       <MasterClassRightPanel
         data={data}
         selectedDate={selectedDate}

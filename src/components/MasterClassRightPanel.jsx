@@ -3,6 +3,20 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 
 const MasterClassRightPanel = ({ data, selectedDate, onDateChange }) => {
+
+  const highlights=[
+    {
+      "title": "Interview Prep for Tech Roles",
+      "date": "2025-10-28",
+      "time": "07:30 PM"
+    },
+    {
+      "title": "Roadmap to Full Stack Developer",
+      "date": "2025-10-26",
+      "time": "04:30 PM"
+    }
+  ]
+
   return (
     <aside className="w-full lg:w-80 bg-white border-t lg:border-t-0 lg:border-l border-gray-100 p-6 flex flex-col gap-8 sticky top-0">
       {/* Admin Info */}
@@ -35,8 +49,9 @@ const MasterClassRightPanel = ({ data, selectedDate, onDateChange }) => {
         <h3 className="text-red-600 font-semibold mb-3">
           Upcoming Highlights
         </h3>
+
         <div className="flex flex-col gap-2">
-          {data.highlights.map((e, i) => (
+          {highlights.map((e, i) => (
             <div
               key={i}
               className="bg-gray-50 p-3 rounded-lg shadow-sm border border-gray-100"
