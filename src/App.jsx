@@ -21,6 +21,7 @@ import Settings from "./pages/Settings";
 import MasterClasses from "./pages/MasterClasses";
 import LoginPage from "./pages/LoginPage";
 import Unauthorized from "./pages/Unauthorized";
+import DoubtSolving from "./modules/doubtSolving/DoubtSolving";
 
 const AppLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -120,6 +121,9 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/programs/doubt-solving" element={<DoubtSolving />} />
+          <Route path="/programs/doubt-solving/view/:id" element={<DoubtSolving />} />
+
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
