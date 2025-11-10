@@ -1,0 +1,100 @@
+{
+  "sessions": [
+    {
+      "date": "November 1, 2025",
+      "details": [
+        {
+          "id": 1,
+          "student": "Raghav Verma",
+          "mentor": "Arjun Mehta",
+          "education": "7-10 Student",
+          "time": "4:00 PM",
+          "query": "Integration Doubt",
+          "status": "Live"
+        },
+        {
+          "id": 2,
+          "student": "Twinkle Khanna",
+          "mentor": "Meera Jain",
+          "education": "B.Tech Student",
+          "time": "5:30 PM",
+          "query": "Binary Trees",
+          "status": "Completed"
+        },
+        {
+          "id": 3,
+          "student": "Neha Verma",
+          "mentor": "Priya Chauhan",
+          "education": "11-12th Student",
+          "time": "1:30 PM",
+          "query": "Regression Confusion",
+          "status": "Scheduled"
+        },
+        {
+          "id": 4,
+          "student": "Ritik Verma",
+          "mentor": "Akash Rajput",
+          "education": "Working professional",
+          "time": "6:30 PM",
+          "query": "JWT Authentication",
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "date": "November 2, 2025",
+      "details": [
+        {
+          "id": 5,
+          "student": "Raghav Verma",
+          "mentor": "Arjun Mehta",
+          "education": "7-10 Student",
+          "time": "4:00 PM",
+          "query": "React Props",
+          "status": "Live"
+        },
+        {
+          "id": 6,
+          "student": "Twinkle Khanna",
+          "mentor": "Meera Jain",
+          "education": "B.Tech Student",
+          "time": "5:30 PM",
+          "query": "API Integration",
+          "status": "Completed"
+        },
+        {
+          "id": 7,
+          "student": "Neha Verma",
+          "mentor": "Priya Chauhan",
+          "education": "11-12th Student",
+          "time": "1:30 PM",
+          "query": "ML Regression",
+          "status": "Scheduled"
+        },
+        {
+          "id": 8,
+          "student": "Ritik Verma",
+          "mentor": "Akash Rajput",
+          "education": "Working professional",
+          "time": "6:30 PM",
+          "query": "JWT Tokens",
+          "status": "Pending"
+        }
+      ]
+    }
+  ],
+  "mentors": [
+    { "name": "Ankit Verma", "role": "Full Stack Developer", "rating": 4.8 },
+    { "name": "Shreya Patel", "role": "Java Developer", "rating": 4.9 }
+  ],
+  "highlights": [
+    {
+      "title": "2 sessions scheduled for tomorrow — Web Design and DSA Fundamentals.",
+      "time": "1st Nov, 2:30 PM"
+    },
+    {
+      "title": "Students appreciated clarity and hands-on guidance provided during sessions.",
+      "time": "1st Nov, 4:30 PM"
+    }
+  ]
+}

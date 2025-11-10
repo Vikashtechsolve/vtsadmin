@@ -22,6 +22,8 @@ import MasterClasses from "./pages/MasterClasses";
 import LoginPage from "./pages/LoginPage";
 import Unauthorized from "./pages/Unauthorized";
 import DoubtSolving from "./modules/doubtSolving/DoubtSolving";
+import MentorshipDashboard from "./pages/MentorshipDashboard/MentorshipDashboard";
+
 
 const AppLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -123,7 +125,7 @@ function App() {
           />
           <Route path="/programs/doubt-solving" element={<DoubtSolving />} />
           <Route path="/programs/doubt-solving/view/:id" element={<DoubtSolving />} />
-
+          <Route path="/programs/mentorship" element={<MentorshipDashboard />} />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
