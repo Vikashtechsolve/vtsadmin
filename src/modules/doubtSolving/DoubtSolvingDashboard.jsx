@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useMemo } from "react";
+import { Filter, ArrowUpDown, CalendarDays } from "lucide-react";
 
 const StatusPill = ({ value }) => {
   const cls =
@@ -8,89 +9,168 @@ const StatusPill = ({ value }) => {
       ? "bg-green-100 text-green-600"
       : value === "Scheduled"
       ? "bg-gray-100 text-gray-600"
-      : value === "Pending"
-      ? "bg-yellow-100 text-yellow-700"
-      : "bg-gray-100 text-gray-600";
-  return <span className={`px-3 py-1 text-xs rounded-full ${cls}`}>{value}</span>;
+      : "bg-yellow-100 text-yellow-700";
+  return (
+    <span className={`px-3 py-1 text-xs font-medium rounded-full ${cls}`}>
+      {value}
+    </span>
+  );
 };
 
 const DoubtSolvingDashboard = ({ data, onAdd, onEdit, onView }) => {
+  const [filterStatus, setFilterStatus] = useState("All");
+  const [sortAsc, setSortAsc] = useState(true);
+
+  // ✅ Filter and sort logic applied dynamically
+  const filteredSessions = useMemo(() => {
+    let result = data.sessions.map((group) => {
+      let details = group.details;
+
+      // Apply filter if not 'All'
+      if (filterStatus !== "All") {
+        details = details.filter((s) => s.status === filterStatus);
+      }
+
+      // Sort by time
+      const parseTime = (t) =>
+        new Date(`1970/01/01 ${t.replace(".", "")}`).getTime();
+
+      details = [...details].sort((a, b) =>
+        sortAsc ? parseTime(a.time) - parseTime(b.time) : parseTime(b.time) - parseTime(a.time)
+      );
+
+      return { ...group, details };
+    });
+
+    return result;
+  }, [data.sessions, filterStatus, sortAsc]);
+
+  // ✅ Filter toggle dropdown (simple version)
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const statuses = ["All", "Live", "Completed", "Scheduled", "Pending"];
+
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
-          Scheduled Doubt Solving Session Details
-        </h3>
-        <button
-          onClick={onAdd}
-          className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
-        >
-          + Schedule Session
-        </button>
+      {/* ===== Header ===== */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex items-center gap-2 text-gray-700 font-medium">
+          <CalendarDays size={18} className="text-red-600" />
+          <h2 className="text-lg sm:text-xl font-semibold text-red-600">
+            Scheduled Doubt Solving Sessions
+          </h2>
+        </div>
+
+        {/* ===== Action Buttons ===== */}
+        <div className="flex items-center gap-3 text-gray-500 text-sm relative">
+          {/* Filter */}
+          <div className="relative">
+            <button
+              className="flex items-center gap-1 hover:text-red-600"
+              onClick={() => setShowFilterMenu(!showFilterMenu)}
+            >
+              <Filter size={16} /> <span>Filter</span>
+            </button>
+
+            {showFilterMenu && (
+              <div className="absolute right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-32">
+                {statuses.map((status) => (
+                  <div
+                    key={status}
+                    onClick={() => {
+                      setFilterStatus(status);
+                      setShowFilterMenu(false);
+                    }}
+                    className={`px-3 py-1.5 cursor-pointer text-sm hover:bg-red-50 hover:text-red-600 ${
+                      filterStatus === status ? "font-semibold text-red-600" : ""
+                    }`}
+                  >
+                    {status}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Sort */}
+          <button
+            className="flex items-center gap-1 hover:text-red-600"
+            onClick={() => setSortAsc(!sortAsc)}
+          >
+            <ArrowUpDown size={16} />{" "}
+            <span>Sort {sortAsc ? "↑" : "↓"}</span>
+          </button>
+
+          {/* Add New Session */}
+          <button
+            onClick={onAdd}
+            className="bg-red-500 text-white px-3 py-1.5 rounded-lg text-sm hover:bg-red-600 transition"
+          >
+            + Schedule
+          </button>
+        </div>
       </div>
 
-      {data.sessions
-        .sort((a, b) => new Date(a.date) - new Date(b.date))
-        .map((group, idx) => (
-          <div key={idx} className="bg-white shadow-sm rounded-xl border border-gray-100">
-            <div className="px-6 pt-5">
-              <p className="text-sm text-gray-500">
-                <span className="font-semibold text-gray-700">Date:</span> {group.date}
-              </p>
-            </div>
+      {/* ===== Sessions ===== */}
+      {filteredSessions.map((group, idx) => (
+        <div key={idx} className="space-y-3">
+          <div className="inline-block bg-gray-100 px-3 py-1 rounded text-sm font-medium text-gray-700 shadow-sm">
+            <span className="font-semibold text-gray-700">Date:</span> {group.date}
+          </div>
 
-            <div className="overflow-x-auto p-6">
-              <table className="w-full text-sm border border-gray-100 rounded-lg">
-                <thead className="bg-gray-50 text-gray-600">
-                  <tr>
-                    <th className="p-3 text-left">Student Name</th>
-                    <th className="p-3 text-left">Mentor</th>
-                    <th className="p-3 text-left">Subject</th>
-                    <th className="p-3 text-left">Time</th>
-                    <th className="p-3 text-left">Plan</th>
-                    <th className="p-3 text-left">Doubts</th>
-                    <th className="p-3 text-left">Status</th>
-                    <th className="p-3 text-left">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {group.details.map((s) => (
+          {/* Table */}
+          <div className="bg-white shadow-sm rounded-xl border border-gray-200 overflow-x-auto">
+            <table className="min-w-full text-sm text-gray-700">
+              <thead className="bg-gray-50 text-gray-600 border-b">
+                <tr>
+                  <th className="p-3 text-left">Student</th>
+                  <th className="p-3 text-left hidden sm:table-cell">Mentor</th>
+                  <th className="p-3 text-left hidden md:table-cell">Subject</th>
+                  <th className="p-3 text-left">Time</th>
+                  <th className="p-3 text-left hidden lg:table-cell">Plan</th>
+                  <th className="p-3 text-left">Action</th>
+                  <th className="p-3 text-left">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {group.details.length > 0 ? (
+                  group.details.map((s) => (
                     <tr key={s.id} className="border-t hover:bg-gray-50">
-                      <td className="p-3">{s.student}</td>
-                      <td className="p-3">{s.mentor}</td>
-                      <td className="p-3">{s.subject}</td>
+                      <td className="p-3 text-gray-800 font-medium">{s.student}</td>
+                      <td className="p-3 hidden sm:table-cell">{s.mentor}</td>
+                      <td className="p-3 hidden md:table-cell">{s.subject}</td>
                       <td className="p-3">{s.time}</td>
-                      <td className="p-3">{s.plan}</td>
-                      <td className="p-3">{s.doubts || "—"}</td>
-                      <td className="p-3"><StatusPill value={s.status} /></td>
-                      <td className="p-3 space-x-2">
+                      <td className="p-3 hidden lg:table-cell">{s.plan}</td>
+                      <td className="p-3 flex gap-2">
                         <button
                           onClick={() => onView(s.id)}
-                          className="text-red-600 hover:underline"
+                          className="text-green-600 text-xs hover:underline"
                         >
                           View
                         </button>
                         <button
-                          onClick={() => onEdit({ ...s, date: group.date })}
-                          className="text-gray-600 hover:underline"
+                          onClick={() => onEdit({ ...s, _groupDate: group.date })}
+                          className="text-blue-600 text-xs hover:underline"
                         >
                           Edit
                         </button>
                       </td>
-                    </tr>
-                  ))}
-                  {group.details.length === 0 && (
-                    <tr>
-                      <td className="p-3 text-gray-500" colSpan={8}>
-                        No sessions for this date.
+                      <td className="p-3">
+                        <StatusPill value={s.status} />
                       </td>
                     </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                  ))
+                ) : (
+                  <tr>
+                    <td className="p-3 text-center text-gray-500" colSpan={7}>
+                      No sessions for this date.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
-        ))}
+        </div>
+      ))}
     </div>
   );
 };

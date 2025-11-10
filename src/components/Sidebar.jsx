@@ -8,11 +8,6 @@ import {
   Newspaper,
   Settings,
   ChevronRight,
-  Users,
-  GraduationCap,
-  ClipboardList,
-  Headphones,
-  FileCheck2,
 } from "lucide-react";
 import logo from "../assets/logo.png";
 
@@ -53,7 +48,7 @@ const Sidebar = ({ isOpen = false, onClose }) => {
 
   return (
     <>
-      {/* Overlay for mobile */}
+      {/* ===== Overlay for Mobile ===== */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/30 z-40 md:hidden"
@@ -61,23 +56,22 @@ const Sidebar = ({ isOpen = false, onClose }) => {
         ></div>
       )}
 
-      {/* Sidebar */}
+      {/* ===== Sidebar ===== */}
       <aside
         className={`fixed md:static top-0 left-0 z-50 w-64 bg-white border-r border-gray-100 shadow-sm 
-        transform transition-transform duration-300 ease-in-out
-        ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"} 
-        md:h-auto h-full font-['Inter']`}
+          transform transition-transform duration-300 ease-in-out
+          ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"} 
+          md:h-auto h-full font-['Inter']`}
       >
-        {/* ===== Logo Section ===== */}
-        <div className="flex items-center justify-center">
-        <img
-          src={logo}
-          alt="VTS Logo"
-          className="h-45 object-contain cursor-pointer"
-          onClick={() => navigate("/")}
-        />
-      </div>
-
+        {/* ===== Compact Logo Section ===== */}
+        <div className="flex items-center md:justify-start justify-center border-b border-gray-100">
+          <img
+            src={logo}
+            alt="Logo"
+            className="h-35 w-auto object-contain cursor-pointer"
+            onClick={() => navigate("/")}
+          />
+        </div>
 
         {/* ===== Navigation ===== */}
         <nav className="flex flex-col px-3 py-5 text-gray-700 font-medium text-[14px] space-y-2">
@@ -100,7 +94,7 @@ const Sidebar = ({ isOpen = false, onClose }) => {
                 </NavLink>
               ) : (
                 <>
-                  {/* Dropdown Button */}
+                  {/* ===== Dropdown Button ===== */}
                   <button
                     onClick={() => handleDropdownToggle(item.name)}
                     className={`flex items-center justify-between w-full px-4 py-2.5 rounded-lg transition-all duration-200 border-l-[3px] ${
@@ -121,7 +115,7 @@ const Sidebar = ({ isOpen = false, onClose }) => {
                     />
                   </button>
 
-                  {/* Dropdown Links */}
+                  {/* ===== Dropdown Links ===== */}
                   {openDropdown === item.name && (
                     <div className="ml-7 mt-1 flex flex-col gap-1 border-l border-red-200 pl-3">
                       {item.children.map((child) => (

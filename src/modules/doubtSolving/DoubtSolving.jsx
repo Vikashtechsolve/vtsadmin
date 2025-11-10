@@ -2,10 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "react-calendar/dist/Calendar.css";
 
-// Fallback local JSON if fetch fails
 import localData from "../../data/doubtSolvingData.json";
-
-import DoubtSolvingIntroCard from "./DoubtSolvingIntroCard";
 import DoubtSolvingDashboard from "./DoubtSolvingDashboard";
 import DoubtSolvingDetails from "./DoubtSolvingDetails";
 import DoubtSolvingRightPanel from "./DoubtSolvingRightPanel";
@@ -18,104 +15,86 @@ const DoubtSolving = () => {
 
   const [data, setData] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
-
   const [showAdd, setShowAdd] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [editItem, setEditItem] = useState(null);
 
-  // Load JSON (remote first, local fallback)
   useEffect(() => {
-    const loadData = async () => {
+    const load = async () => {
       try {
         const res = await fetch("/data/doubtSolvingData.json");
-        if (res.ok) {
-          const json = await res.json();
-          setData(json);
-        } else {
-          setData(localData);
-        }
+        setData(res.ok ? await res.json() : localData);
       } catch {
         setData(localData);
       }
     };
-    loadData();
+    load();
   }, []);
 
-  // Add new session (into the date bucket)
   const handleAdd = (newSession) => {
     setData((prev) => {
-      const existsIdx = prev.sessions.findIndex(
-        (g) => g.date === newSession.date
-      );
-      if (existsIdx >= 0) {
-        const updated = [...prev.sessions];
-        updated[existsIdx] = {
-          ...updated[existsIdx],
-          details: [...updated[existsIdx].details, newSession],
-        };
-        return { ...prev, sessions: updated };
-      }
-      return {
-        ...prev,
-        sessions: [...prev.sessions, { date: newSession.date, details: [newSession] }],
-      };
+      const updated = { ...prev };
+      const idx = updated.sessions.findIndex((g) => g.date === newSession.date);
+      if (idx >= 0) updated.sessions[idx].details.push(newSession);
+      else updated.sessions.push({ date: newSession.date, details: [newSession] });
+      return updated;
     });
   };
 
-  // Save edit
-  const handleSaveEdit = (updated) => {
+  const handleSaveEdit = (updatedSession) => {
     setData((prev) => ({
       ...prev,
       sessions: prev.sessions.map((group) => ({
         ...group,
-        details: group.details.map((s) => (s.id === updated.id ? updated : s)),
+        details: group.details.map((d) =>
+          d.id === updatedSession.id ? { ...d, ...updatedSession } : d
+        ),
       })),
     }));
   };
 
-  if (!data) {
+  if (!data)
     return (
       <div className="flex justify-center items-center min-h-screen text-gray-600">
-        Loading Doubt Solving Sessions...
+        Loading sessions...
       </div>
     );
-  }
 
-  // Flatten for finding a single session by id
   const flat = data.sessions.flatMap((g) =>
     g.details.map((d) => ({ ...d, _groupDate: g.date }))
   );
-  const session = id ? flat.find((d) => d.id === parseInt(id, 10)) : null;
+  const selected = id ? flat.find((s) => s.id === parseInt(id)) : null;
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-50">
-      <div className="flex-1 p-6 lg:p-10">
+      {/* Left main section */}
+      <div className="flex-1 p-4 sm:p-6 lg:p-10">
         {!id ? (
-          <>
-            <DoubtSolvingIntroCard />
-            <DoubtSolvingDashboard
-              data={data}
-              onAdd={() => setShowAdd(true)}
-              onEdit={(item) => {
-                setEditItem(item);
-                setShowEdit(true);
-              }}
-              onView={(sid) => navigate(`/programs/doubt-solving/view/${sid}`)}
-            />
-          </>
+          <DoubtSolvingDashboard
+            data={data}
+            onAdd={() => setShowAdd(true)}
+            onEdit={(s) => {
+              setEditItem(s);
+              setShowEdit(true);
+            }}
+            onView={(sid) => navigate(`/programs/doubt-solving/view/${sid}`)}
+          />
         ) : (
           <DoubtSolvingDetails
-            session={session}
-            onBack={() => navigate(-1)}
+            session={selected}
+            onBack={() => navigate("/programs/doubt-solving")}
           />
         )}
       </div>
 
-      <DoubtSolvingRightPanel
-        data={data}
-        selectedDate={selectedDate}
-        onDateChange={setSelectedDate}
-      />
+      {/* Right panel (collapses on mobile) */}
+      <div className="hidden lg:block w-[320px] border-l bg-white">
+        <DoubtSolvingRightPanel
+          data={data}
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
+        />
+      </div>
 
       {/* Modals */}
       <AddDoubtSessionForm
