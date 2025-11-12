@@ -5,9 +5,9 @@ import {
   ArrowDownZA,
   Filter,
   ArrowUpDown,
-} from "lucide-react"; // ✅ Updated icons
+} from "lucide-react";
 import MentorshipViewModal from "./MentorshipViewModal";
-import OverviewImage from "../../assets/cpimg.png"; // ✅ Overview image
+import OverviewImage from "../../assets/cpimg.png";
 
 // 🔹 Status Pill Component
 const StatusPill = ({ status }) => {
@@ -42,21 +42,19 @@ const DashboardMain = ({ data }) => {
 
   const statuses = ["All", "Live", "Completed", "Scheduled", "Pending"];
 
-  // 🔹 Enhanced Filter + Sort + Search Logic
+  // 🔹 Filter + Sort + Search Logic
   const filteredSessions = useMemo(() => {
     if (!data?.sessions) return [];
 
     return data.sessions.map((g) => {
       let details = g.details || [];
 
-      // ✅ Filter by Status
       if (filterStatus !== "All") {
         details = details.filter(
           (s) => s.status.toLowerCase() === filterStatus.toLowerCase()
         );
       }
 
-      // ✅ Search by Student, Mentor, or Query (multi-term)
       if (searchQuery.trim()) {
         const terms = searchQuery.toLowerCase().split(" ");
         details = details.filter((s) =>
@@ -68,7 +66,6 @@ const DashboardMain = ({ data }) => {
         );
       }
 
-      // ✅ Sorting
       details = [...details];
       details.sort((a, b) => {
         const getValue = (key, obj) => {
@@ -96,9 +93,6 @@ const DashboardMain = ({ data }) => {
     return details.slice(start, start + rowsPerPage);
   };
 
-  // 🔹 Sort options
-  const sortOptions = ["time", "student", "mentor", "status"];
-
   return (
     <>
       {/* ================= HEADER ================= */}
@@ -120,10 +114,9 @@ const DashboardMain = ({ data }) => {
         </div>
       </div>
 
-      {/* ================= OVERVIEW SECTION ================= */}
+      {/* ================= OVERVIEW ================= */}
       <div className="flex flex-col sm:flex-row items-center justify-between bg-transparent mb-8 gap-6">
-        {/* Red Info Card */}
-        <div className="bg-[#B91C1C] text-white p-6 sm:p-7 rounded-2xl shadow-lg flex-1 w-full sm:w-auto">
+        <div className="bg-[#B91C1C] text-white p-6 sm:p-7 rounded-2xl shadow-lg flex-1">
           <h2 className="text-lg sm:text-xl font-semibold mb-2">
             Mentorship Overview
           </h2>
@@ -133,24 +126,23 @@ const DashboardMain = ({ data }) => {
           </p>
         </div>
 
-        {/* Right-side Illustration */}
-        <div className="flex justify-center items-center sm:justify-end w-full sm:w-auto">
+        <div className="flex justify-center items-center sm:justify-end">
           <img
             src={OverviewImage}
-            alt="Mentorship Overview Illustration"
+            alt="Mentorship Overview"
             className="w-40 sm:w-48 md:w-56 object-contain drop-shadow-md"
           />
         </div>
       </div>
 
-      {/* ================= FILTER + SORT CONTROLS ================= */}
+      {/* ================= FILTER + SORT ================= */}
       <div className="flex flex-wrap items-center justify-between mb-4 gap-3">
         <h3 className="text-lg font-semibold text-red-600">
-          Upcoming Mentorship Booked Sessions
+          Upcoming Mentorship Sessions
         </h3>
 
         <div className="flex items-center gap-3 text-gray-500 text-sm relative">
-          {/* Filter Dropdown */}
+          {/* Filter */}
           <div className="relative">
             <button
               className="flex items-center gap-1 hover:text-red-600"
@@ -182,7 +174,7 @@ const DashboardMain = ({ data }) => {
             )}
           </div>
 
-          {/* Sort Button */}
+          {/* Sort */}
           <button
             className="flex items-center gap-1 hover:text-red-600"
             onClick={() =>
@@ -195,12 +187,12 @@ const DashboardMain = ({ data }) => {
         </div>
       </div>
 
-      {/* ================= SESSION TABLES ================= */}
+      {/* ================= SESSION TABLE ================= */}
       <div className="space-y-6">
         {filteredSessions.map((group) => (
           <div key={group.date} className="space-y-3">
             <div className="inline-block bg-gray-100 px-3 py-1 rounded text-sm font-medium text-gray-700 shadow-sm">
-              <span className="font-semibold">Date :</span> {group.date}
+              <span className="font-semibold">Date:</span> {group.date}
             </div>
 
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
@@ -224,23 +216,30 @@ const DashboardMain = ({ data }) => {
                     paginate(group.details).map((s, i) => (
                       <tr
                         key={s.id}
-                        className={`${
-                          i % 2 === 1 ? "bg-gray-50" : "bg-white"
-                        } border-t hover:bg-gray-50 transition`}
+                        className={`border-t transition ${
+                          s.status === "Completed"
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : i % 2 === 1
+                            ? "bg-gray-50 hover:bg-gray-100"
+                            : "bg-white hover:bg-gray-50"
+                        }`}
                       >
-                        <td className="p-3 text-gray-800">{s.student}</td>
-                        <td className="p-3 text-gray-600 hidden sm:table-cell">
-                          {s.mentor}
-                        </td>
-                        <td className="p-3 text-gray-600 hidden md:table-cell">
+                        <td className="p-3">{s.student}</td>
+                        <td className="p-3 hidden sm:table-cell">{s.mentor}</td>
+                        <td className="p-3 hidden md:table-cell">
                           {s.education}
                         </td>
-                        <td className="p-3 text-gray-600">{s.time}</td>
+                        <td className="p-3">{s.time}</td>
                         <td
                           onClick={() =>
+                            s.status !== "Completed" &&
                             setViewItem({ ...s, _groupDate: group.date })
                           }
-                          className="p-3 text-red-600 underline cursor-pointer hover:text-red-800"
+                          className={`p-3 underline ${
+                            s.status === "Completed"
+                              ? "text-gray-400 cursor-not-allowed"
+                              : "text-red-600 hover:text-red-800 cursor-pointer"
+                          }`}
                         >
                           View
                         </td>

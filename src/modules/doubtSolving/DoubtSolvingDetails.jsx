@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { X, CalendarDays } from "lucide-react";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
 
 const DoubtSolvingDetails = ({ session, onBack, onSubmit }) => {
   const [editableSession, setEditableSession] = useState({ ...session });
+  const [showCalendar, setShowCalendar] = useState(false);
 
   if (!session)
     return (
@@ -11,18 +14,32 @@ const DoubtSolvingDetails = ({ session, onBack, onSubmit }) => {
       </div>
     );
 
+  // ✅ Update single field
   const handleChange = (field, value) => {
     setEditableSession((prev) => ({ ...prev, [field]: value }));
   };
 
+  // ✅ Update registration details
   const handleRegistrationChange = (index, field, value) => {
     const updated = [...editableSession.registration];
     updated[index][field] = value;
     setEditableSession((prev) => ({ ...prev, registration: updated }));
   };
 
+  // ✅ Save and close modal
   const handleSubmit = () => {
     if (onSubmit) onSubmit(editableSession);
+  };
+
+  // ✅ Handle calendar date select
+  const handleDateChange = (date) => {
+    const formattedDate = date.toLocaleDateString("en-US", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+    handleChange("_groupDate", formattedDate);
+    setShowCalendar(false);
   };
 
   const mentors = ["Arjun Mehta", "Priya Verma", "Ravi Singh", "Neha Kapoor"];
@@ -30,11 +47,11 @@ const DoubtSolvingDetails = ({ session, onBack, onSubmit }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-3 sm:p-4">
-      <div className="bg-white w-full max-w-md sm:max-w-lg rounded-2xl shadow-xl overflow-y-auto max-h-[90vh] animate-fadeIn">
+      <div className="bg-white w-full max-w-md sm:max-w-lg rounded-2xl shadow-xl overflow-y-auto max-h-[90vh] animate-fadeIn relative">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b bg-gray-50">
+        <div className="flex items-center justify-between px-5 py-4 border-b bg-gray-50 sticky top-0 z-10">
           <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
-            Students Doubt Details
+            Student Doubt Details
           </h2>
           <button onClick={onBack} className="text-gray-400 hover:text-gray-600">
             <X size={22} />
@@ -43,8 +60,8 @@ const DoubtSolvingDetails = ({ session, onBack, onSubmit }) => {
 
         {/* Body */}
         <div className="p-5 sm:p-6 space-y-5">
+          {/* Subject & Topic */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Subject */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Subject
@@ -57,7 +74,6 @@ const DoubtSolvingDetails = ({ session, onBack, onSubmit }) => {
               />
             </div>
 
-            {/* Topic */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Topic
@@ -71,7 +87,7 @@ const DoubtSolvingDetails = ({ session, onBack, onSubmit }) => {
             </div>
           </div>
 
-          {/* Mentor Dropdown */}
+          {/* Mentor */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Mentor
@@ -103,7 +119,7 @@ const DoubtSolvingDetails = ({ session, onBack, onSubmit }) => {
             />
           </div>
 
-          {/* Status Dropdown */}
+          {/* Status */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Status
@@ -122,26 +138,35 @@ const DoubtSolvingDetails = ({ session, onBack, onSubmit }) => {
             </select>
           </div>
 
-          {/* Date */}
-          <div>
+          {/* Date Picker */}
+          <div className="relative">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Date
+              Session Date
             </label>
             <div className="relative">
               <CalendarDays
                 size={16}
-                className="absolute left-3 top-3 text-gray-400"
+                className="absolute left-3 top-3 text-gray-400 cursor-pointer"
+                onClick={() => setShowCalendar(!showCalendar)}
               />
               <input
                 type="text"
+                readOnly
                 value={editableSession._groupDate || ""}
-                onChange={(e) => handleChange("_groupDate", e.target.value)}
-                className="w-full pl-9 pr-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+                onClick={() => setShowCalendar(!showCalendar)}
+                className="w-full pl-9 pr-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-200 focus:outline-none cursor-pointer bg-white"
               />
             </div>
+
+            {/* Calendar Dropdown */}
+            {showCalendar && (
+              <div className="absolute top-full mt-2 z-50 bg-white border border-gray-200 rounded-xl shadow-lg p-2">
+                <Calendar onChange={handleDateChange} value={new Date()} />
+              </div>
+            )}
           </div>
 
-          {/* Registered Students (Editable) */}
+          {/* Registered Students */}
           {editableSession.registration &&
             editableSession.registration.length > 0 && (
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mt-3">

@@ -6,7 +6,7 @@ const MentorshipViewModal = ({ session, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-3 sm:p-4">
-      <div className="bg-white w-full max-w-md sm:max-w-lg rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh] animate-fadeIn">
+      <div className="bg-white w-full max-w-md sm:max-w-lg rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
           <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
@@ -31,11 +31,11 @@ const MentorshipViewModal = ({ session, onClose }) => {
               type="text"
               value={session.student || ""}
               readOnly
-              className="readonly-input"
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-sm cursor-not-allowed"
             />
           </div>
 
-          {/* Mentor Name */}
+          {/* Mentor */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Mentor <span className="text-red-500">*</span>
@@ -44,52 +44,48 @@ const MentorshipViewModal = ({ session, onClose }) => {
               type="text"
               value={session.mentor || ""}
               readOnly
-              className="readonly-input"
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-sm cursor-not-allowed"
             />
           </div>
 
-          {/* Education Level */}
+          {/* Education */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Education Level <span className="text-red-500">*</span>
+              Education Level
             </label>
             <input
               type="text"
               value={session.education || "—"}
               readOnly
-              className="readonly-input"
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-sm cursor-not-allowed"
             />
           </div>
 
-          {/* Subject / Plan */}
+          {/* Subject / Plan + Time */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Subject / Plan <span className="text-red-500">*</span>
+                Subject / Plan
               </label>
               <input
                 type="text"
                 value={session.plan || "General Mentorship"}
                 readOnly
-                className="readonly-input"
+                className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-sm cursor-not-allowed"
               />
             </div>
 
-            {/* Time */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Scheduled Time <span className="text-red-500">*</span>
+                Scheduled Time
               </label>
               <div className="relative">
-                <Clock
-                  size={16}
-                  className="absolute left-3 top-3 text-gray-400"
-                />
+                <Clock size={16} className="absolute left-3 top-3 text-gray-400" />
                 <input
                   type="text"
                   value={session.time || "—"}
                   readOnly
-                  className="readonly-input pl-9"
+                  className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-sm cursor-not-allowed"
                 />
               </div>
             </div>
@@ -98,22 +94,22 @@ const MentorshipViewModal = ({ session, onClose }) => {
           {/* Doubt / Query */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Student Doubt / Query <span className="text-red-500">*</span>
+              Student Doubt / Query
             </label>
             <textarea
               rows={3}
               value={session.query || session.doubts || "No query provided"}
               readOnly
-              className="readonly-input resize-none"
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-sm cursor-not-allowed resize-none"
             />
           </div>
 
           {/* Status */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Session Status <span className="text-red-500">*</span>
+              Session Status
             </label>
-            <div className="readonly-input flex items-center gap-2">
+            <div className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-sm flex items-center gap-2">
               <span
                 className={`h-3 w-3 rounded-full ${
                   session.status === "Live"
@@ -129,30 +125,27 @@ const MentorshipViewModal = ({ session, onClose }) => {
             </div>
           </div>
 
-          {/* Date */}
+          {/* Session Date */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Session Date <span className="text-red-500">*</span>
+              Session Date
             </label>
             <div className="relative">
-              <CalendarDays
-                size={16}
-                className="absolute left-3 top-3 text-gray-400"
-              />
+              <CalendarDays size={16} className="absolute left-3 top-3 text-gray-400" />
               <input
                 type="text"
                 value={session._groupDate || "—"}
                 readOnly
-                className="readonly-input pl-9"
+                className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-sm cursor-not-allowed"
               />
             </div>
           </div>
 
-          {/* Registration Info (if exists) */}
+          {/* Registered Students */}
           {session.registration && session.registration.length > 0 && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Registered Student Details
+                Registered Students
               </label>
               <div className="border rounded-xl divide-y">
                 {session.registration.map((r, idx) => (
@@ -181,7 +174,7 @@ const MentorshipViewModal = ({ session, onClose }) => {
             </div>
           )}
 
-          {/* Close Button */}
+          {/* Footer */}
           <div className="flex justify-end pt-4 border-t mt-6">
             <button
               onClick={onClose}
@@ -191,13 +184,6 @@ const MentorshipViewModal = ({ session, onClose }) => {
             </button>
           </div>
         </div>
-
-        {/* Tailwind-in-JS */}
-        <style>{`
-          .readonly-input {
-            @apply w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 focus:outline-none cursor-not-allowed text-sm;
-          }
-        `}</style>
       </div>
     </div>
   );

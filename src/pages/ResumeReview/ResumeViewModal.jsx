@@ -6,7 +6,7 @@ const ResumeViewModal = ({ session, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-3 sm:p-4">
-      <div className="bg-white w-full max-w-md sm:max-w-lg rounded-2xl shadow-xl overflow-y-auto max-h-[90vh] animate-fadeIn">
+      <div className="bg-white w-full max-w-md sm:max-w-lg rounded-2xl shadow-xl overflow-y-auto max-h-[90vh]">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
           <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
@@ -19,27 +19,46 @@ const ResumeViewModal = ({ session, onClose }) => {
 
         {/* Content */}
         <div className="p-6 space-y-5">
+          {/* Student Name */}
           <div>
             <label className="text-sm font-medium text-gray-700 mb-1 block">
               Student Name
             </label>
-            <input type="text" readOnly value={session.student || ""} className="readonly-input" />
+            <input
+              type="text"
+              readOnly
+              value={session.student || ""}
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-sm cursor-not-allowed"
+            />
           </div>
 
+          {/* Mentor Name */}
           <div>
             <label className="text-sm font-medium text-gray-700 mb-1 block">
               Mentor Name
             </label>
-            <input type="text" readOnly value={session.mentor || ""} className="readonly-input" />
+            <input
+              type="text"
+              readOnly
+              value={session.mentor || ""}
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-sm cursor-not-allowed"
+            />
           </div>
 
+          {/* Education */}
           <div>
             <label className="text-sm font-medium text-gray-700 mb-1 block">
               Education
             </label>
-            <input type="text" readOnly value={session.education || ""} className="readonly-input" />
+            <input
+              type="text"
+              readOnly
+              value={session.education || ""}
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-sm cursor-not-allowed"
+            />
           </div>
 
+          {/* Career Goal */}
           <div>
             <label className="text-sm font-medium text-gray-700 mb-1 block">
               Career Goal
@@ -47,23 +66,30 @@ const ResumeViewModal = ({ session, onClose }) => {
             <textarea
               readOnly
               value={session.careerGoal || ""}
-              className="readonly-input resize-none"
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-sm cursor-not-allowed resize-none"
               rows={3}
             />
           </div>
 
+          {/* Session Time */}
           <div>
             <label className="text-sm font-medium text-gray-700 mb-1 block">
               Session Time
             </label>
-            <input type="text" readOnly value={session.time || ""} className="readonly-input" />
+            <input
+              type="text"
+              readOnly
+              value={session.time || ""}
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-sm cursor-not-allowed"
+            />
           </div>
 
+          {/* Status */}
           <div>
             <label className="text-sm font-medium text-gray-700 mb-1 block">
               Status
             </label>
-            <div className="readonly-input flex items-center gap-2">
+            <div className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-sm flex items-center gap-2">
               <span
                 className={`h-3 w-3 rounded-full ${
                   session.status === "Live"
@@ -79,6 +105,7 @@ const ResumeViewModal = ({ session, onClose }) => {
             </div>
           </div>
 
+          {/* Review Date */}
           <div>
             <label className="text-sm font-medium text-gray-700 mb-1 block">
               Review Date
@@ -89,11 +116,12 @@ const ResumeViewModal = ({ session, onClose }) => {
                 type="text"
                 readOnly
                 value={session._groupDate || "—"}
-                className="readonly-input pl-9"
+                className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-sm cursor-not-allowed"
               />
             </div>
           </div>
 
+          {/* Footer */}
           <div className="flex justify-end pt-4 border-t mt-6">
             <button
               onClick={onClose}
@@ -103,12 +131,6 @@ const ResumeViewModal = ({ session, onClose }) => {
             </button>
           </div>
         </div>
-
-        <style>{`
-          .readonly-input {
-            @apply w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 focus:outline-none cursor-not-allowed;
-          }
-        `}</style>
       </div>
     </div>
   );

@@ -1,8 +1,15 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
-import { Filter, ArrowUpDown, CalendarDays } from "lucide-react";
-import OverviewImage from "../../assets/Problemsolving.png";
-import doubtSolvingData from "../../data/doubtSolvingData.json";
-import RightPanel from "./RightPanel"; // optional right panel (like ResumeReview)
+import {
+  SlidersHorizontal,
+  ArrowUpZA,
+  ArrowDownZA,
+  Filter,
+  ArrowUpDown,
+} from "lucide-react";
+import ResumeViewModal from "./ResumeViewModal";
+import OverviewImage from "../../assets/resume.png";
+import RightPanel from "./RightPanel";
+import resumeReviewData from "../../data/resumeReviewData.json";
 
 // 🔹 Status Pill Component
 const StatusPill = ({ status }) => {
@@ -10,10 +17,10 @@ const StatusPill = ({ status }) => {
     status === "Live"
       ? "bg-red-100 text-red-600"
       : status === "Completed"
-      ? "bg-green-100 text-green-600"
-      : status === "Scheduled"
-      ? "bg-gray-100 text-gray-600"
-      : "bg-yellow-100 text-yellow-700";
+        ? "bg-green-100 text-green-600"
+        : status === "Scheduled"
+          ? "bg-gray-100 text-gray-600"
+          : "bg-yellow-100 text-yellow-700";
 
   return (
     <span
@@ -25,16 +32,17 @@ const StatusPill = ({ status }) => {
 };
 
 // 🔹 Main Component
-const DoubtSolvingDashboard = () => {
-  const data = doubtSolvingData;
+const ResumeReviewMain = () => {
+  const data = resumeReviewData;
 
   const [filterStatus, setFilterStatus] = useState("All");
   const [sortBy, setSortBy] = useState("student");
   const [sortAsc, setSortAsc] = useState(true);
   const [showFilterMenu, setShowFilterMenu] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [viewItem, setViewItem] = useState(null);
   const [page, setPage] = useState(1);
-  const rowsPerPage = 4;
+  const rowsPerPage = 3;
   const filterMenuRef = useRef(null);
 
   const statuses = ["All", "Live", "Completed", "Scheduled", "Pending"];
@@ -42,10 +50,7 @@ const DoubtSolvingDashboard = () => {
   // 🔸 Close Filter Menu on Outside Click
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        filterMenuRef.current &&
-        !filterMenuRef.current.contains(event.target)
-      ) {
+      if (filterMenuRef.current && !filterMenuRef.current.contains(event.target)) {
         setShowFilterMenu(false);
       }
     };
@@ -63,7 +68,7 @@ const DoubtSolvingDashboard = () => {
           (filterStatus === "All" || s.status === filterStatus) &&
           (s.student.toLowerCase().includes(searchQuery.toLowerCase()) ||
             s.mentor.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            s.subject.toLowerCase().includes(searchQuery.toLowerCase()))
+            s.careerGoal.toLowerCase().includes(searchQuery.toLowerCase()))
       );
 
       // Sorting logic
@@ -95,12 +100,12 @@ const DoubtSolvingDashboard = () => {
           {/* ===== HEADER ===== */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <h1 className="text-2xl font-semibold text-red-700">
-              Doubt Solving Dashboard
+              Resume Review
             </h1>
             <div className="w-full lg:max-w-md">
               <input
                 type="search"
-                placeholder="Search student, mentor, or subject..."
+                placeholder="Search student, mentor, or goal..."
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 shadow-sm focus:ring-2 focus:ring-red-200 focus:outline-none"
                 value={searchQuery}
                 onChange={(e) => {
@@ -121,18 +126,18 @@ const DoubtSolvingDashboard = () => {
               borderRadius: "12px",
               opacity: 1,
               position: "relative",
+             
               transform: "rotate(0deg)",
               padding: "24px 32px",
             }}
           >
             <div className="flex-1">
               <h2 className="text-xl md:text-2xl font-semibold mb-2">
-                Doubt Solving Overview
+                Resume Review Overview
               </h2>
               <p className="text-sm md:text-base text-white/90 leading-relaxed">
-                Track all your live 1:1 doubt solving sessions, student
-                interactions, and mentor engagements easily with real-time
-                updates.
+                Manage all resume reviews, mentor sessions, and student career progress
+                efficiently with detailed insights.
               </p>
             </div>
 
@@ -140,15 +145,16 @@ const DoubtSolvingDashboard = () => {
               <img
                 src={OverviewImage}
                 alt="Overview"
-                className="w-25 sm:w-28 md:w-32 lg:w-36 object-contain"
+                className="w-25 sm:w-25 md:w-27 lg:w-45 object-contain"
               />
             </div>
           </div>
 
+
           {/* ===== FILTER + SORT CONTROLS ===== */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <h3 className="text-lg font-semibold text-red-700">
-              Upcoming Doubt Solving Sessions
+              Upcoming Resume Reviews
             </h3>
 
             <div className="flex items-center gap-3 text-gray-500 text-sm relative">
@@ -171,11 +177,10 @@ const DoubtSolvingDashboard = () => {
                           setShowFilterMenu(false);
                           setPage(1);
                         }}
-                        className={`px-3 py-1.5 cursor-pointer text-sm hover:bg-red-50 hover:text-red-600 ${
-                          filterStatus === status
+                        className={`px-3 py-1.5 cursor-pointer text-sm hover:bg-red-50 hover:text-red-600 ${filterStatus === status
                             ? "font-semibold text-red-600"
                             : ""
-                        }`}
+                          }`}
                       >
                         {status}
                       </div>
@@ -211,10 +216,10 @@ const DoubtSolvingDashboard = () => {
                         Mentor
                       </th>
                       <th className="p-3 text-left hidden md:table-cell">
-                        Subject
+                        Education
                       </th>
                       <th className="p-3 text-left">Time</th>
-                      <th className="p-3 text-left">Plan</th>
+                      <th className="p-3 text-left">Career Goal</th>
                       <th className="p-3 text-left">Action</th>
                       <th className="p-3 text-left">Status</th>
                     </tr>
@@ -223,30 +228,28 @@ const DoubtSolvingDashboard = () => {
                     {paginate(group.details).map((s, i) => (
                       <tr
                         key={s.id}
-                        className={`border-t transition ${
-                          s.status === "Completed"
+                        className={`border-t transition ${s.status === "Completed"
                             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                             : i % 2 === 1
-                            ? "bg-gray-50 hover:bg-gray-100"
-                            : "bg-white hover:bg-gray-50"
-                        }`}
+                              ? "bg-gray-50 hover:bg-gray-100"
+                              : "bg-white hover:bg-gray-50"
+                          }`}
                       >
                         <td className="p-3 font-medium">{s.student}</td>
                         <td className="p-3 hidden sm:table-cell">{s.mentor}</td>
-                        <td className="p-3 hidden md:table-cell">
-                          {s.subject}
-                        </td>
+                        <td className="p-3 hidden md:table-cell">{s.education}</td>
                         <td className="p-3">{s.time}</td>
-                        <td className="p-3">{s.plan}</td>
+                        <td className="p-3">{s.careerGoal}</td>
                         <td className="p-3">
                           <button
-                            onClick={() => alert(`Viewing ${s.student}`)}
+                            onClick={() =>
+                              setViewItem({ ...s, _groupDate: group.date })
+                            }
                             disabled={s.status === "Completed"}
-                            className={`underline text-sm ${
-                              s.status === "Completed"
+                            className={`underline text-sm ${s.status === "Completed"
                                 ? "text-gray-400 cursor-not-allowed"
                                 : "text-red-600 hover:text-red-800"
-                            }`}
+                              }`}
                           >
                             View
                           </button>
@@ -268,8 +271,13 @@ const DoubtSolvingDashboard = () => {
           <RightPanel data={data} />
         </div>
       </div>
+
+      {/* ===== MODAL ===== */}
+      {viewItem && (
+        <ResumeViewModal session={viewItem} onClose={() => setViewItem(null)} />
+      )}
     </div>
   );
 };
 
-export default DoubtSolvingDashboard;
+export default ResumeReviewMain;
