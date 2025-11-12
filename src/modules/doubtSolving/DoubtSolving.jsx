@@ -64,21 +64,7 @@ const DoubtSolving = () => {
         <DoubtSolvingDashboard data={filteredData} onView={handleView} />
       </div>
 
-      {/* ===== RIGHT SIDE: Panel Section ===== */}
-      <div className="w-full lg:w-[360px] xl:w-[400px] bg-white border-l border-gray-100 shadow-sm h-full overflow-y-auto">
-        {/* ✅ Calendar at top */}
-        <div className="p-5 border-b">
-          <h4 className="text-sm font-semibold text-red-600 mb-3">
-            Select a Date
-          </h4>
-          <div className="rounded-xl border border-gray-100 shadow-sm overflow-hidden mb-5">
-            <Calendar
-              onChange={setSelectedDate}
-              value={selectedDate}
-              className="react-calendar-custom w-full"
-            />
-          </div>
-        </div>
+     
 
         {/* ✅ Right Panel data (top mentors / highlights) */}
         <DoubtSolvingRightPanel
@@ -86,7 +72,7 @@ const DoubtSolving = () => {
           selectedDate={selectedDate}
           onDateChange={setSelectedDate}
         />
-      </div>
+   
 
       {/* ===== MODAL / DETAILS VIEW ===== */}
       {showDetails && (
