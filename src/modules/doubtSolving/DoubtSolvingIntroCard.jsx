@@ -1,18 +1,33 @@
 import React from "react";
-import overviewImg from "../../assets/online-meetings.png";
+import overviewImg from "../../assets/Problemsolving.png"; // ✅ Use your new image
 
 const DoubtSolvingIntroCard = () => {
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-start gap-6 sm:gap-8 mb-8">
-      <div className="flex items-center justify-center bg-[#fef4f4] rounded-full w-36 h-36 shadow-sm overflow-hidden">
-        <img src={overviewImg} alt="Doubt Solving" className="w-24 h-24 object-contain" />
+    <div
+      className="relative flex items-center justify-between shadow-md"
+      style={{
+        backgroundColor: "#B11C20", // ✅ Same as image theme red
+        width: "712px",
+        height: "140px",
+        borderRadius: "12px",
+        padding: "24px 32px",
+      }}
+    >
+      {/* ===== Left Text Section ===== */}
+      <div className="text-white flex flex-col justify-center">
+        <h2 className="text-xl font-semibold mb-1">Welcome Back,</h2>
+        <p className="text-sm leading-relaxed text-white/90">
+          Here’s today’s summary of all live 1:1 doubt solving activities!
+        </p>
       </div>
 
-      <div className="bg-[#a42025] text-white px-6 py-5 sm:px-8 sm:py-6 rounded-xl shadow-md w-full sm:w-[420px]">
-        <h2 className="text-xl sm:text-2xl font-semibold mb-2">Doubt Solving Overview</h2>
-        <p className="text-sm sm:text-base text-red-100 leading-relaxed">
-          See all scheduled 1:1 doubt sessions, track live status, and drill into session details.
-        </p>
+      {/* ===== Right Image Section ===== */}
+      <div className="flex items-center justify-end h-full">
+        <img
+          src={overviewImg}
+          alt="Problem Solving Overview"
+          className="h-[90px] w-auto object-contain"
+        />
       </div>
     </div>
   );

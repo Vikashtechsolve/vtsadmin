@@ -1,8 +1,15 @@
-import React, { useState, useMemo } from "react";
-import { Filter, ArrowUpDown } from "lucide-react";
+import { useState, useMemo } from "react";
+import {
+  SlidersHorizontal,
+  ArrowUpZA,
+  ArrowDownZA,
+  Filter,
+  ArrowUpDown,
+} from "lucide-react"; // ✅ Updated icons
 import MentorshipViewModal from "./MentorshipViewModal";
-import OverviewImage from "../../assets/cpimg.png"; // ✅ <-- Correct image import
+import OverviewImage from "../../assets/cpimg.png"; // ✅ Overview image
 
+// 🔹 Status Pill Component
 const StatusPill = ({ status }) => {
   const cls =
     status === "Live"
@@ -22,63 +29,88 @@ const StatusPill = ({ status }) => {
   );
 };
 
+// 🔹 Main Dashboard Component
 const DashboardMain = ({ data }) => {
   const [filterStatus, setFilterStatus] = useState("All");
-  const [sortBy, setSortBy] = useState("date");
+  const [sortBy, setSortBy] = useState("time");
+  const [sortOrder, setSortOrder] = useState("asc");
   const [viewItem, setViewItem] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
   const rowsPerPage = 3;
 
-  // 🔹 Filter + Sort + Search logic
+  const statuses = ["All", "Live", "Completed", "Scheduled", "Pending"];
+
+  // 🔹 Enhanced Filter + Sort + Search Logic
   const filteredSessions = useMemo(() => {
-    const sessions = [...data.sessions];
+    if (!data?.sessions) return [];
 
-    const filtered = sessions.map((g) => ({
-      ...g,
-      details: g.details.filter(
-        (s) =>
-          (filterStatus === "All" || s.status === filterStatus) &&
-          (s.student.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            s.mentor.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (s.query || s.doubts || "")
-              .toLowerCase()
-              .includes(searchQuery.toLowerCase()))
-      ),
-    }));
+    return data.sessions.map((g) => {
+      let details = g.details || [];
 
-    // Sorting
-    if (sortBy === "name") {
-      filtered.forEach((g) =>
-        g.details.sort((a, b) => a.student.localeCompare(b.student))
-      );
-    } else if (sortBy === "status") {
-      filtered.forEach((g) =>
-        g.details.sort((a, b) => a.status.localeCompare(b.status))
-      );
-    }
+      // ✅ Filter by Status
+      if (filterStatus !== "All") {
+        details = details.filter(
+          (s) => s.status.toLowerCase() === filterStatus.toLowerCase()
+        );
+      }
 
-    return filtered;
-  }, [data.sessions, filterStatus, sortBy, searchQuery]);
+      // ✅ Search by Student, Mentor, or Query (multi-term)
+      if (searchQuery.trim()) {
+        const terms = searchQuery.toLowerCase().split(" ");
+        details = details.filter((s) =>
+          terms.every((term) =>
+            [s.student, s.mentor, s.query, s.doubts]
+              .filter(Boolean)
+              .some((field) => field.toLowerCase().includes(term))
+          )
+        );
+      }
+
+      // ✅ Sorting
+      details = [...details];
+      details.sort((a, b) => {
+        const getValue = (key, obj) => {
+          if (key === "time") {
+            return new Date(`1970/01/01 ${obj.time}`).getTime();
+          }
+          return (obj[key] || "").toString().toLowerCase();
+        };
+
+        const valA = getValue(sortBy, a);
+        const valB = getValue(sortBy, b);
+
+        if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+        if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+        return 0;
+      });
+
+      return { ...g, details };
+    });
+  }, [data, filterStatus, sortBy, sortOrder, searchQuery]);
 
   // 🔹 Pagination helper
   const paginate = (details) => {
     const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    return details.slice(start, end);
+    return details.slice(start, start + rowsPerPage);
   };
+
+  // 🔹 Sort options
+  const sortOptions = ["time", "student", "mentor", "status"];
 
   return (
     <>
-      {/* Top Header */}
+      {/* ================= HEADER ================= */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <h1 className="text-2xl font-semibold text-red-600">Dashboard</h1>
 
+        {/* 🔍 Search Bar */}
         <div className="w-full md:max-w-lg">
           <input
             type="search"
             placeholder="Search student, mentor, or query..."
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 shadow-sm focus:outline-none"
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 shadow-sm focus:outline-none focus:ring-1 focus:ring-red-500"
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
@@ -88,7 +120,7 @@ const DashboardMain = ({ data }) => {
         </div>
       </div>
 
-      {/* 🔴 Mentorship Overview Section */}
+      {/* ================= OVERVIEW SECTION ================= */}
       <div className="flex flex-col sm:flex-row items-center justify-between bg-transparent mb-8 gap-6">
         {/* Red Info Card */}
         <div className="bg-[#B91C1C] text-white p-6 sm:p-7 rounded-2xl shadow-lg flex-1 w-full sm:w-auto">
@@ -111,42 +143,59 @@ const DashboardMain = ({ data }) => {
         </div>
       </div>
 
-      {/* 🔍 Filter & Sort Controls */}
+      {/* ================= FILTER + SORT CONTROLS ================= */}
       <div className="flex flex-wrap items-center justify-between mb-4 gap-3">
         <h3 className="text-lg font-semibold text-red-600">
           Upcoming Mentorship Booked Sessions
         </h3>
-        <div className="flex items-center gap-3 flex-wrap text-sm text-gray-600">
-          <select
-            value={filterStatus}
-            onChange={(e) => {
-              setFilterStatus(e.target.value);
-              setPage(1);
-            }}
-            className="border border-gray-300 rounded-lg px-2 py-1 text-gray-700 focus:outline-none"
-          >
-            <option value="All">All</option>
-            <option value="Live">Live</option>
-            <option value="Completed">Completed</option>
-            <option value="Scheduled">Scheduled</option>
-            <option value="Pending">Pending</option>
-          </select>
 
+        <div className="flex items-center gap-3 text-gray-500 text-sm relative">
+          {/* Filter Dropdown */}
+          <div className="relative">
+            <button
+              className="flex items-center gap-1 hover:text-red-600"
+              onClick={() => setShowFilterMenu(!showFilterMenu)}
+            >
+              <Filter size={16} /> <span>Filter</span>
+            </button>
+
+            {showFilterMenu && (
+              <div className="absolute right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-32">
+                {statuses.map((status) => (
+                  <div
+                    key={status}
+                    onClick={() => {
+                      setFilterStatus(status);
+                      setShowFilterMenu(false);
+                      setPage(1);
+                    }}
+                    className={`px-3 py-1.5 cursor-pointer text-sm hover:bg-red-50 hover:text-red-600 ${
+                      filterStatus === status
+                        ? "font-semibold text-red-600"
+                        : ""
+                    }`}
+                  >
+                    {status}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Sort Button */}
           <button
+            className="flex items-center gap-1 hover:text-red-600"
             onClick={() =>
-              setSortBy((prev) =>
-                prev === "date" ? "name" : prev === "name" ? "status" : "date"
-              )
+              setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"))
             }
-            className="flex items-center gap-1 border border-gray-300 px-2 py-1 rounded-lg hover:text-red-600 transition"
           >
-            <ArrowUpDown size={16} />
-            <span className="capitalize">Sort by {sortBy}</span>
+            <ArrowUpDown size={16} />{" "}
+            <span>Sort {sortOrder === "asc" ? "↑" : "↓"}</span>
           </button>
         </div>
       </div>
 
-      {/* 🧾 Sessions by Date */}
+      {/* ================= SESSION TABLES ================= */}
       <div className="space-y-6">
         {filteredSessions.map((group) => (
           <div key={group.date} className="space-y-3">
@@ -159,12 +208,14 @@ const DashboardMain = ({ data }) => {
                 <thead className="bg-gray-50 text-gray-600">
                   <tr>
                     <th className="p-3 text-left">Student</th>
-                    <th className="p-3 text-left hidden sm:table-cell">Mentor</th>
+                    <th className="p-3 text-left hidden sm:table-cell">
+                      Mentor
+                    </th>
                     <th className="p-3 text-left hidden md:table-cell">
                       Education
                     </th>
                     <th className="p-3 text-left">Time</th>
-                    <th className="p-3 text-left">Query</th>
+                    <th className="p-3 text-left">Action</th>
                     <th className="p-3 text-left">Status</th>
                   </tr>
                 </thead>
@@ -189,7 +240,7 @@ const DashboardMain = ({ data }) => {
                           onClick={() =>
                             setViewItem({ ...s, _groupDate: group.date })
                           }
-                          className="p-3 text-red-600 underline cursor-pointer"
+                          className="p-3 text-red-600 underline cursor-pointer hover:text-red-800"
                         >
                           View
                         </td>
@@ -211,45 +262,11 @@ const DashboardMain = ({ data }) => {
                 </tbody>
               </table>
             </div>
-
-            {/* Pagination */}
-            {group.details.length > rowsPerPage && (
-              <div className="flex justify-end items-center gap-2 mt-3 text-sm text-gray-600">
-                <button
-                  disabled={page === 1}
-                  onClick={() => setPage((p) => p - 1)}
-                  className={`px-3 py-1 border rounded-lg ${
-                    page === 1
-                      ? "opacity-50 cursor-not-allowed"
-                      : "hover:bg-gray-100"
-                  }`}
-                >
-                  Prev
-                </button>
-                <span>
-                  Page <strong>{page}</strong> of{" "}
-                  {Math.ceil(group.details.length / rowsPerPage)}
-                </span>
-                <button
-                  disabled={
-                    page === Math.ceil(group.details.length / rowsPerPage)
-                  }
-                  onClick={() => setPage((p) => p + 1)}
-                  className={`px-3 py-1 border rounded-lg ${
-                    page === Math.ceil(group.details.length / rowsPerPage)
-                      ? "opacity-50 cursor-not-allowed"
-                      : "hover:bg-gray-100"
-                  }`}
-                >
-                  Next
-                </button>
-              </div>
-            )}
           </div>
         ))}
       </div>
 
-      {/* Modal */}
+      {/* ================= MODAL ================= */}
       {viewItem && (
         <MentorshipViewModal
           session={viewItem}

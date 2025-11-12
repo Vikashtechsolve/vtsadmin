@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 
-const DoubtSolvingRightPanel = ({ data = {}, selectedDate, onDateChange }) => {
+const RightPanel = ({ data = {} }) => {
+  const [value, setValue] = useState(new Date());
+
   return (
     <aside className="p-6 space-y-8 bg-white rounded-2xl">
       {/* ================= ADMIN INFO ================= */}
@@ -21,15 +23,12 @@ const DoubtSolvingRightPanel = ({ data = {}, selectedDate, onDateChange }) => {
       {/* ================= CALENDAR ================= */}
       <div>
         <h4 className="text-sm font-semibold text-red-600 mb-2">
-          {new Date().toLocaleString("default", {
-            month: "long",
-            year: "numeric",
-          })}
+          {new Date().toLocaleString("default", { month: "long", year: "numeric" })}
         </h4>
         <div className="rounded-xl border border-gray-100 shadow-sm overflow-hidden bg-white">
           <Calendar
-            value={selectedDate}
-            onChange={onDateChange}
+            value={value}
+            onChange={setValue}
             className="react-calendar-custom"
           />
         </div>
@@ -64,9 +63,7 @@ const DoubtSolvingRightPanel = ({ data = {}, selectedDate, onDateChange }) => {
             ))}
           </div>
         ) : (
-          <p className="text-gray-400 text-sm italic">
-            No mentor data available
-          </p>
+          <p className="text-gray-400 text-sm italic">No mentor data available</p>
         )}
       </div>
 
@@ -83,23 +80,17 @@ const DoubtSolvingRightPanel = ({ data = {}, selectedDate, onDateChange }) => {
                 key={i}
                 className="flex flex-col border-b last:border-b-0 pb-2 last:pb-0"
               >
-                <div className="text-sm text-gray-700 font-medium">
-                  {h.title}
-                </div>
-                <div className="text-xs text-gray-400 mt-1">
-                  {h.date} • {h.time}
-                </div>
+                <div className="text-sm text-gray-700 font-medium">{h.title}</div>
+                <div className="text-xs text-gray-400 mt-1">{h.time}</div>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-gray-400 text-sm italic">
-            No highlights for today
-          </p>
+          <p className="text-gray-400 text-sm italic">No highlights for today</p>
         )}
       </div>
     </aside>
   );
 };
 
-export default DoubtSolvingRightPanel;
+export default RightPanel;

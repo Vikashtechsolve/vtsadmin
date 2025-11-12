@@ -23,7 +23,8 @@ import LoginPage from "./pages/LoginPage";
 import Unauthorized from "./pages/Unauthorized";
 import DoubtSolving from "./modules/doubtSolving/DoubtSolving";
 import MentorshipDashboard from "./pages/MentorshipDashboard/MentorshipDashboard";
-
+import ResumeReviewMain from "./pages/ResumeReview/ResumeReviewMain";
+import resumeReviewData from "./data/resumeReviewData.json";
 
 const AppLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -127,6 +128,9 @@ function App() {
           <Route path="/programs/doubt-solving/view/:id" element={<DoubtSolving />} />
           <Route path="/programs/mentorship" element={<MentorshipDashboard />} />
 
+          <Route path="/programs/resume-review" element={<ResumeReviewMain />}/>
+          <Route path="/programs/resume-review/view/:id" element={<ResumeReviewMain />}/>
+         
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>

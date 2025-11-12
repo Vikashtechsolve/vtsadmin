@@ -44,7 +44,7 @@ const MentorshipDashboard = () => {
       </div>
 
       {/* Right panel */}
-      <div className="hidden xl:block w-80 border-l bg-white">
+      <div className="hidden xl:block w-80  bg-white">
         <RightPanel data={data} />
       </div>
     </div>

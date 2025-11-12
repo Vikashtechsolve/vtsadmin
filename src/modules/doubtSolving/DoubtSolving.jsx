@@ -88,7 +88,7 @@ const DoubtSolving = () => {
       </div>
 
       {/* Right panel (collapses on mobile) */}
-      <div className="hidden lg:block w-[320px] border-l bg-white">
+      <div className="hidden lg:block w-[320px] bg-white">
         <DoubtSolvingRightPanel
           data={data}
           selectedDate={selectedDate}

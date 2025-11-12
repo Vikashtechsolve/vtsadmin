@@ -1,0 +1,100 @@
+{
+  "sessions": [
+    {
+      "date": "November 2, 2025",
+      "details": [
+        {
+          "id": 1,
+          "student": "Raghav Verma",
+          "mentor": "Arjun Mehta",
+          "education": "M.Tech",
+          "time": "4:00 PM",
+          "careerGoal": "Frontend Developer Role",
+          "status": "Live"
+        },
+        {
+          "id": 2,
+          "student": "Twinkle Khaana",
+          "mentor": "Meera Jain",
+          "education": "Fresher",
+          "time": "5:30 PM",
+          "careerGoal": "Backend Developer",
+          "status": "Completed"
+        },
+        {
+          "id": 3,
+          "student": "Neha Verma",
+          "mentor": "Priya Chauhan",
+          "education": "B.Tech",
+          "time": "1:30 PM",
+          "careerGoal": "Data Analyst",
+          "status": "Scheduled"
+        },
+        {
+          "id": 4,
+          "student": "Ritik Verma",
+          "mentor": "Akash Rajput",
+          "education": "Working professional",
+          "time": "6:30 PM",
+          "careerGoal": "Full Stack Developer",
+          "status": "Pending"
+        }
+      ]
+    },
+    {
+      "date": "November 1, 2025",
+      "details": [
+        {
+          "id": 5,
+          "student": "Raghav Verma",
+          "mentor": "Arjun Mehta",
+          "education": "M.Tech",
+          "time": "4:00 PM",
+          "careerGoal": "Frontend Developer Role",
+          "status": "Live"
+        },
+        {
+          "id": 6,
+          "student": "Twinkle Khaana",
+          "mentor": "Meera Jain",
+          "education": "Fresher",
+          "time": "5:30 PM",
+          "careerGoal": "Backend Developer",
+          "status": "Completed"
+        },
+        {
+          "id": 7,
+          "student": "Neha Verma",
+          "mentor": "Priya Chauhan",
+          "education": "B.Tech",
+          "time": "1:30 PM",
+          "careerGoal": "Data Analyst",
+          "status": "Scheduled"
+        },
+        {
+          "id": 8,
+          "student": "Ritik Verma",
+          "mentor": "Akash Rajput",
+          "education": "Working professional",
+          "time": "6:30 PM",
+          "careerGoal": "Full Stack Developer",
+          "status": "Pending"
+        }
+      ]
+    }
+  ],
+  "highlights": [
+    {
+      "title": "New mentor Arjun Mehta joined frontend mentorship program.",
+      "time": "3:00 PM"
+    },
+    {
+      "title": "Resume review for Raghav scheduled tomorrow.",
+      "time": "2:30 PM"
+    }
+  ],
+  "mentors": [
+    { "name": "Arjun Mehta", "role": "Frontend Mentor", "rating": 4.9 },
+    { "name": "Meera Jain", "role": "Backend Mentor", "rating": 4.8 }
+  ]
+}

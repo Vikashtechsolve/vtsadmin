@@ -33,6 +33,48 @@
           "plan": "Quick mentor",
           "doubts": "Binary tree traversal confusion",
           "status": "Completed"
+        },
+        {
+          "id": 3,
+          "student": "Ananya Sharma",
+          "mentor": "Arjun Mehta",
+          "subject": "Maths",
+          "topic": "Integration",
+          "time": "4:00 PM",
+          "plan": "Deep learning",
+          "doubts": "I am having trouble understanding how to solve ∫(2x² + 3x + 1) dx. Can you please explain the step-by-step process and how to find the constant of integration?",
+          "status": "Live",
+          "registration": [
+            {
+              "name": "Riya S.",
+              "email": "riyas@example.com",
+              "mobile": "9876543210",
+              "graduationYear": "2026",
+              "status": "Confirmed"
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "student": "Arjun Singh",
+          "mentor": "Meera Jain",
+          "subject": "DSA",
+          "topic": "Binary Trees",
+          "time": "5:30 PM",
+          "plan": "Quick mentor",
+          "doubts": "Binary tree traversal confusion",
+          "status": "Completed"
+        },
+        {
+          "id": 5,
+          "student": "Arjun Singh",
+          "mentor": "Meera Jain",
+          "subject": "DSA",
+          "topic": "Binary Trees",
+          "time": "5:30 PM",
+          "plan": "Quick mentor",
+          "doubts": "Binary tree traversal confusion",
+          "status": "Completed"
         }
       ]
     },
