@@ -1,30 +1,30 @@
+
+
 import React, { useState, useMemo } from "react";
 import { Filter, ArrowUpDown, CalendarDays, Search } from "lucide-react";
-import doubtSolvingData from "../../data/doubtSolvingData.json";
 import DoubtSolvingIntroCard from "../../modules/doubtSolving/DoubtSolvingIntroCard";
 
 const StatusPill = ({ value }) => {
+  const status = value.toLowerCase();
+
   const cls =
-    value === "Live"
+    status === "live"
       ? "bg-red-100 text-red-600"
-      : value === "Completed"
+      : status === "resolved"
       ? "bg-green-100 text-green-600"
-      : value === "Scheduled"
+      : status === "scheduled"
       ? "bg-gray-100 text-gray-600"
-      : "bg-yellow-100 text-yellow-700";
+      : "bg-yellow-100 text-yellow-700"; // pending
 
   return (
-    <span
-      className={`px-3 py-1 text-xs sm:text-sm font-medium rounded-full ${cls}`}
-    >
-      {value}
+    <span className={`px-3 py-1 text-xs sm:text-sm font-medium rounded-full ${cls}`}>
+      {value.charAt(0).toUpperCase() + value.slice(1)}
     </span>
   );
 };
 
-const DoubtSolvingDashboard = ({ onView }) => {
-  const data = doubtSolvingData;
-
+const DoubtSolvingDashboard = ({ onView, data }) => {
+  console.log(data)
   const [filterStatus, setFilterStatus] = useState("All");
   const [sortAsc, setSortAsc] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -32,11 +32,30 @@ const DoubtSolvingDashboard = ({ onView }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const ITEMS_PER_PAGE = 6;
 
-  const statuses = ["All", "Live", "Completed", "Scheduled", "Pending"];
+  // Convert date "12-11-2025" → JS Date (2025-11-12)
+  const parseDate = (d) => {
+    const [day, month, year] = d.split("-");
+    return new Date(`${year}-${month}-${day}`);
+  };
 
+  const statuses = ["All", "Live", "Resolved", "Scheduled", "Pending"];
+
+  // 1️⃣ SORT groups by date ASC
+  const sortedSessions = useMemo(() => {
+    return [...data.sessions].sort(
+      (a, b) => parseDate(a.date) - parseDate(b.date)
+    );
+  }, [data.sessions]);
+
+  // 2️⃣ APPLY FILTER + SEARCH + SORT
   const filteredSessions = useMemo(() => {
-    return data.sessions.map((group) => {
-      let details = group.details;
+    return sortedSessions.map((group) => {
+      let details = group.details.map((s) => ({
+        ...s,
+        status: s.status.charAt(0).toUpperCase() + s.status.slice(1), // normalize
+        mentor: s.mentorName || "Not Assigned",
+        student: s.name,
+      }));
 
       if (filterStatus !== "All") {
         details = details.filter((s) => s.status === filterStatus);
@@ -44,6 +63,7 @@ const DoubtSolvingDashboard = ({ onView }) => {
 
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
+
         details = details.filter(
           (s) =>
             s.student.toLowerCase().includes(q) ||
@@ -52,16 +72,16 @@ const DoubtSolvingDashboard = ({ onView }) => {
         );
       }
 
+      // Sort by time within group
       details = [...details].sort((a, b) =>
-        sortAsc
-          ? a.time.localeCompare(b.time)
-          : b.time.localeCompare(a.time)
+        sortAsc ? a.time.localeCompare(b.time) : b.time.localeCompare(a.time)
       );
 
       return { ...group, details };
     });
-  }, [data.sessions, filterStatus, sortAsc, searchQuery]);
+  }, [sortedSessions, filterStatus, sortAsc, searchQuery]);
 
+  // 3️⃣ FLATTEN for pagination
   const flatSessions = useMemo(
     () =>
       filteredSessions.flatMap((group) =>
@@ -74,11 +94,14 @@ const DoubtSolvingDashboard = ({ onView }) => {
   );
 
   const totalPages = Math.ceil(flatSessions.length / ITEMS_PER_PAGE);
-  const paginated = flatSessions.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
 
+  // const paginated = flatSessions.slice(
+  //   (currentPage - 1) * ITEMS_PER_PAGE,
+  //   currentPage * ITEMS_PER_PAGE
+  // );
+  const paginated = flatSessions;
+
+  // 4️⃣ GROUP AGAIN by date after pagination
   const grouped = useMemo(() => {
     const groups = {};
     for (const s of paginated) {
@@ -90,6 +113,7 @@ const DoubtSolvingDashboard = ({ onView }) => {
 
   return (
     <div className="space-y-8 p-4 sm:p-6 md:p-8">
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h1 className="text-2xl sm:text-3xl font-bold text-red-700">
@@ -98,10 +122,7 @@ const DoubtSolvingDashboard = ({ onView }) => {
 
         {/* Search */}
         <div className="relative w-full sm:max-w-sm">
-          <Search
-            size={18}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-          />
+          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
             placeholder="Search student, mentor, or subject..."
@@ -115,7 +136,7 @@ const DoubtSolvingDashboard = ({ onView }) => {
         </div>
       </div>
 
-      {/* Welcome card */}
+      {/* Intro Card */}
       <DoubtSolvingIntroCard />
 
       {/* Controls */}
@@ -148,9 +169,7 @@ const DoubtSolvingDashboard = ({ onView }) => {
                       setCurrentPage(1);
                     }}
                     className={`px-3 py-1.5 cursor-pointer hover:bg-red-50 ${
-                      filterStatus === status
-                        ? "font-semibold text-red-600"
-                        : ""
+                      filterStatus === status ? "font-semibold text-red-600" : ""
                     }`}
                   >
                     {status}
@@ -165,8 +184,7 @@ const DoubtSolvingDashboard = ({ onView }) => {
             className="flex items-center gap-1 hover:text-red-600"
             onClick={() => setSortAsc(!sortAsc)}
           >
-            <ArrowUpDown size={16} />{" "}
-            <span>Sort {sortAsc ? "↑" : "↓"}</span>
+            <ArrowUpDown size={16} /> <span>Sort {sortAsc ? "↑" : "↓"}</span>
           </button>
         </div>
       </div>
@@ -185,37 +203,38 @@ const DoubtSolvingDashboard = ({ onView }) => {
                   <tr>
                     <th className="p-3 text-left">Student</th>
                     <th className="p-3 text-left hidden sm:table-cell">Mentor</th>
-                    <th className="p-3 text-left hidden md:table-cell">
-                      Subject
-                    </th>
+                    <th className="p-3 text-left hidden md:table-cell">Subject</th>
                     <th className="p-3 text-left">Time</th>
                     <th className="p-3 text-left hidden lg:table-cell">Plan</th>
                     <th className="p-3 text-left">Action</th>
                     <th className="p-3 text-left">Status</th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {group.details.map((s) => (
                     <tr
-                      key={s.id}
+                      key={s._id}
                       className={`border-t ${
-                        s.status === "Completed"
+                        s.status === "Resolved"
                           ? "bg-gray-100 text-gray-400"
                           : "hover:bg-gray-50"
                       }`}
                     >
+                      {console.log("Rendering session:", s.status)}
                       <td className="p-3 font-medium">{s.student}</td>
                       <td className="p-3 hidden sm:table-cell">{s.mentor}</td>
                       <td className="p-3 hidden md:table-cell">{s.subject}</td>
                       <td className="p-3">{s.time}</td>
                       <td className="p-3 hidden lg:table-cell">{s.plan}</td>
+
                       <td className="p-3">
                         <button
                           onClick={() =>
                             onView({ ...s, _groupDate: group.date })
                           }
                           className={`underline text-sm ${
-                            s.status === "Completed"
+                            s.status === "Resolved"
                               ? "text-gray-400 cursor-not-allowed"
                               : "text-red-600 hover:text-red-800"
                           }`}
@@ -223,12 +242,14 @@ const DoubtSolvingDashboard = ({ onView }) => {
                           View
                         </button>
                       </td>
+
                       <td className="p-3">
                         <StatusPill value={s.status} />
                       </td>
                     </tr>
                   ))}
                 </tbody>
+
               </table>
             </div>
           </div>
