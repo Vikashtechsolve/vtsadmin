@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import DashboardMain from "./DashboardMain";
 import RightPanel from "./RightPanel";
@@ -9,16 +10,55 @@ const MentorshipDashboard = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch("/data/mentorshipData.json");
+        const res = await fetch("/api/mentorship");
+
         if (res.ok) {
-          setData(await res.json());
+          const apiData = await res.json();
+
+          // --- TRANSFORM API DATA → UI FORMAT ---
+          const transformed = {
+            sessions: apiData.sessions.map((group) => {
+              // Convert date: "28-10-2025" → "October 28, 2025"
+              const [day, month, year] = group.date.split("-");
+              const formattedDate = new Date(
+                `${year}-${month}-${day}`
+              ).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              });
+
+              return {
+                date: formattedDate,
+                details: group.details.map((item) => ({
+                  id: item._id,
+                  student: item.name,
+                  mentor: item.mentorName || "Not Assigned",
+                  education: "Not Provided", // API does not send education
+                  time: item.time,
+                  query: item.query,
+                  email:item.email,
+                  mobile:item.mobile,
+                  status:
+                    item.status.charAt(0).toUpperCase() +
+                    item.status.slice(1).toLowerCase(), // pending → Pending
+                })),
+              };
+            }),
+
+            mentors: apiData.mentors || [],
+            highlights: apiData.highlights || [],
+          };
+
+          setData(transformed);
         } else {
-          setData(localData);
+          setData(localData); // fallback to local JSON
         }
-      } catch {
-        setData(localData);
+      } catch (err) {
+        setData(localData); // fallback
       }
     };
+
     load();
   }, []);
 
