@@ -24,7 +24,7 @@ const StatusPill = ({ value }) => {
 };
 
 const DoubtSolvingDashboard = ({ onView, data }) => {
-  console.log(data)
+  
   const [filterStatus, setFilterStatus] = useState("All");
   const [sortAsc, setSortAsc] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -221,7 +221,6 @@ const DoubtSolvingDashboard = ({ onView, data }) => {
                           : "hover:bg-gray-50"
                       }`}
                     >
-                      {console.log("Rendering session:", s.status)}
                       <td className="p-3 font-medium">{s.student}</td>
                       <td className="p-3 hidden sm:table-cell">{s.mentor}</td>
                       <td className="p-3 hidden md:table-cell">{s.subject}</td>
