@@ -33,12 +33,16 @@ const MentorshipDashboard = () => {
                 details: group.details.map((item) => ({
                   id: item._id,
                   student: item.name,
+                  subject: item.subject,
+                  file: item.file || null,
                   mentor: item.mentorName || "Not Assigned",
                   education: "Not Provided", // API does not send education
                   time: item.time,
                   query: item.query,
                   email:item.email,
                   mobile:item.mobile,
+                  createdAt: item.createdAt,
+                  updatedAt: item.updatedAt,
                   status:
                     item.status.charAt(0).toUpperCase() +
                     item.status.slice(1).toLowerCase(), // pending → Pending
