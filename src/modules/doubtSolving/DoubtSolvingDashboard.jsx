@@ -30,7 +30,7 @@ const DoubtSolvingDashboard = ({ onView, data }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilterMenu, setShowFilterMenu] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const ITEMS_PER_PAGE = 6;
+  const ITEMS_PER_PAGE = 10000;
 
   // Convert date "12-11-2025" → JS Date (2025-11-12)
   const parseDate = (d) => {

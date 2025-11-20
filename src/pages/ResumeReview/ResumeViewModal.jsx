@@ -4,7 +4,7 @@ import { IoClose } from "react-icons/io5";
 import { CalendarDays, Download } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const ResumeViewModal = ({ session, onClose }) => {
+const ResumeViewModal = ({ session, onClose, onUpdate }) => {
   if (!session) return null;
 
   const baseUrl = import.meta.env.VITE_API_URL;
@@ -38,6 +38,14 @@ const ResumeViewModal = ({ session, onClose }) => {
 
       if (json.success) {
         alert("Updated successfully!");
+
+        //  RETURN updated session to parent
+        onUpdate({
+          ...session,
+          mentorName,
+          status: status.toLowerCase(),
+        });
+
         onClose();
       } else {
         alert("Failed to update.");

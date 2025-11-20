@@ -5,6 +5,7 @@ import Calendar from "react-calendar";
 import { motion, AnimatePresence } from "framer-motion";
 import "react-calendar/dist/Calendar.css";
 
+
 const DoubtSolvingDetails = ({ session, onBack, onSubmit }) => {
   if (!session)
     return (
@@ -37,30 +38,38 @@ const DoubtSolvingDetails = ({ session, onBack, onSubmit }) => {
   };
 
   const handleSubmit = async () => {
-    try {
-      const payload = {
-        subject: editableSession.subject,
-        doubt: editableSession.doubts,
+  try {
+    const payload = {
+      subject: editableSession.subject,
+      doubt: editableSession.doubts,
+      mentorName: editableSession.mentor,
+      status: editableSession.status?.toLowerCase(),
+      date: editableSession._groupDate,
+      time: editableSession.time,
+    };
+
+    const res = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/doubts/${editableSession._id}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    // 🔥 UPDATE DOM BY RETURNING NEW VALUES TO PARENT
+    if (onSubmit) {
+      onSubmit({
+        ...editableSession,
         mentorName: editableSession.mentor,
-        status: editableSession.status?.toLowerCase(),
-        date: editableSession._groupDate,
-        time: editableSession.time,
-      };
-
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/doubts/${editableSession._id}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
-
-      if (onSubmit) onSubmit(editableSession);
-    } catch (err) {
-      console.error("Update Error:", err);
+        status: editableSession.status,
+        doubts: editableSession.doubts,
+      });
     }
-  };
+  } catch (err) {
+    console.error("Update Error:", err);
+  }
+};
 
   const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -110,7 +119,7 @@ const DoubtSolvingDetails = ({ session, onBack, onSubmit }) => {
                   </span>
 
                   <button
-                    onClick={() => window.open(`${baseUrl}/${editableSession.file}`, "_blank")}
+                    onClick={() => window.open(`${editableSession.file}`, "_blank")}
                     className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
                   >
                     <Download size={18} /> Download
