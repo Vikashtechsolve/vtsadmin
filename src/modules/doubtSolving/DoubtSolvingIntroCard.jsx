@@ -1,5 +1,5 @@
 import React from "react";
-import overviewImg from "../../assets/ProblemSolving.png"; // ✅ Use your new image
+import overviewImg from "../../assets/Problemsolving.png"; // ✅ Use your new image
 
 const DoubtSolvingIntroCard = () => {
   return (
