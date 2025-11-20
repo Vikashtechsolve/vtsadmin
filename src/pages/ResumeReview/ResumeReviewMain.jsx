@@ -42,7 +42,7 @@ const ResumeReviewMain = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewItem, setViewItem] = useState(null);
   const [page, setPage] = useState(1);
-  const rowsPerPage = 3;
+  const rowsPerPage = 100000;
 
   const filterMenuRef = useRef(null);
 
@@ -109,6 +109,17 @@ const ResumeReviewMain = () => {
       return { ...group, details };
     });
   }, [apiData, filterStatus, sortBy, sortAsc, searchQuery]);
+
+  const handleSessionUpdate = (updated) => {
+  setApiData((prev) =>
+    prev.map((group) => ({
+      ...group,
+      details: group.details.map((item) =>
+        item._id === updated._id ? { ...item, ...updated } : item
+      ),
+    }))
+  );
+};
 
   const paginate = (details) => {
     const start = (page - 1) * rowsPerPage;
@@ -298,6 +309,7 @@ const ResumeReviewMain = () => {
         <ResumeViewModal
           session={viewItem}
           onClose={() => setViewItem(null)}
+          onUpdate={handleSessionUpdate} 
         />
       )}
     </div>

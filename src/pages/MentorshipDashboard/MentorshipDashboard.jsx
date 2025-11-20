@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import DashboardMain from "./DashboardMain";
 import RightPanel from "./RightPanel";
@@ -39,8 +38,8 @@ const MentorshipDashboard = () => {
                   education: "Not Provided", // API does not send education
                   time: item.time,
                   query: item.query,
-                  email:item.email,
-                  mobile:item.mobile,
+                  email: item.email,
+                  mobile: item.mobile,
                   createdAt: item.createdAt,
                   updatedAt: item.updatedAt,
                   status:
@@ -78,7 +77,8 @@ const MentorshipDashboard = () => {
       {/* Main content area */}
       <div className="flex-1">
         <div className="p-4 sm:p-6 lg:p-10">
-          <DashboardMain data={data} />
+          {/* Passed setData down so child components can update global state */}
+          <DashboardMain data={data} setData={setData} />
         </div>
       </div>
 
