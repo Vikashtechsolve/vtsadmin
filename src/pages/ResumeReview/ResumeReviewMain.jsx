@@ -272,7 +272,7 @@ const ResumeReviewMain = () => {
                         <td className="p-3 hidden sm:table-cell">
                           {s.mentorName || "—"}
                         </td>
-                        <td classn ame="p-3">{s.time}</td>
+                        <td className="p-3">{s.time}</td>
                         <td className="p-3">{s.careerGoal}</td>
 
                         <td className="p-3">

@@ -16,7 +16,6 @@ import Dashboard from "./modules/dashboard/Dashboard";
 import Programs from "./pages/Programs";
 import Products from "./pages/Products";
 import About from "./pages/About";
-import Blogs from "./pages/Blogs";
 import Settings from "./pages/Settings";
 import MasterClasses from "./pages/MasterClasses";
 import LoginPage from "./pages/LoginPage";
@@ -24,6 +23,11 @@ import Unauthorized from "./pages/Unauthorized";
 import DoubtSolving from "./modules/doubtSolving/DoubtSolving";
 import MentorshipDashboard from "./pages/MentorshipDashboard/MentorshipDashboard";
 import ResumeReviewMain from "./pages/ResumeReview/ResumeReviewMain";
+import ManageVTS from "./pages/ManageVTS/ManageVTS";
+import Blogs from "./pages/ManageVTS/Blogs";
+import Mentors from "./pages/ManageVTS/Mentors";
+import JoinUs from "./pages/ManageVTS/JoinUs";
+import ContactUs from "./pages/ManageVTS/ContactUs";
 import resumeReviewData from "./data/resumeReviewData.json";
 
 const AppLayout = () => {
@@ -93,14 +97,6 @@ function App() {
             }
           />
           <Route
-            path="/blogs"
-            element={
-              <ProtectedRoute>
-                <Blogs />
-              </ProtectedRoute>
-            }
-          />
-          <Route
             path="/settings"
             element={
               <ProtectedRoute>
@@ -130,6 +126,15 @@ function App() {
 
           <Route path="/programs/resume-review" element={<ResumeReviewMain />}/>
           <Route path="/programs/resume-review/view/:id" element={<ResumeReviewMain />}/>
+
+          {/* Manage VTS Routes */}
+          <Route path="/manage-vts" element={<ManageVTS />}>
+            <Route index element={<Navigate to="/manage-vts/blogs" replace />} />
+            <Route path="blogs" element={<Blogs />} />
+            <Route path="mentors" element={<Mentors />} />
+            <Route path="joinus" element={<JoinUs />} />
+            <Route path="contact" element={<ContactUs />} />
+          </Route>
          
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
