@@ -5,9 +5,9 @@ import {
   BookOpen,
   Laptop,
   Info,
-  Newspaper,
   Settings,
   ChevronRight,
+  Settings2,
 } from "lucide-react";
 import logo from "../assets/logo.png";
 
@@ -41,8 +41,17 @@ const Sidebar = ({ isOpen = false, onClose }) => {
         { name: "Manpower Management", path: "/products/manpower" },
       ],
     },
+    {
+      name: "Manage VTS",
+      icon: <Settings2 size={18} />,
+      children: [
+        { name: "Blogs", path: "/manage-vts/blogs" },
+        { name: "Mentor Details", path: "/manage-vts/mentors" },
+        { name: "Join Us", path: "/manage-vts/joinus" },
+        { name: "Contact Us", path: "/manage-vts/contact" },
+      ],
+    },
     { name: "About Us", icon: <Info size={18} />, path: "/about" },
-    { name: "Blogs", icon: <Newspaper size={18} />, path: "/blogs" },
     { name: "Settings", icon: <Settings size={18} />, path: "/settings" },
   ];
 

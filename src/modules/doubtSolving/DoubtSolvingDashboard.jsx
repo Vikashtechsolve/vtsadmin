@@ -32,29 +32,70 @@ const DoubtSolvingDashboard = ({ onView, data }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const ITEMS_PER_PAGE = 10000;
 
-  // Convert date "12-11-2025" → JS Date (2025-11-12)
-  const parseDate = (d) => {
-    const [day, month, year] = d.split("-");
-    return new Date(`${year}-${month}-${day}`);
+  // Convert various date formats to JS Date
+  const parseDate = (dateStr) => {
+    if (!dateStr) return new Date(0);
+    
+    // Try parsing as formatted date string (e.g., "October 28, 2025")
+    const parsed = new Date(dateStr);
+    if (!isNaN(parsed.getTime())) {
+      return parsed;
+    }
+    
+    // Try parsing as "DD-MM-YYYY" format
+    if (dateStr.includes("-") && dateStr.split("-").length === 3) {
+      const parts = dateStr.split("-");
+      // Check if it's DD-MM-YYYY (day > 12) or YYYY-MM-DD (year is first)
+      if (parts[0].length === 4) {
+        // YYYY-MM-DD format
+        return new Date(dateStr);
+      } else {
+        // DD-MM-YYYY format
+        const [day, month, year] = parts;
+        return new Date(`${year}-${month}-${day}`);
+      }
+    }
+    
+    // Fallback: return current date if parsing fails
+    return new Date();
   };
 
   const statuses = ["All", "Live", "Resolved", "Scheduled", "Pending"];
 
   // 1️⃣ SORT groups by date ASC
   const sortedSessions = useMemo(() => {
+    if (!data.sessions || !Array.isArray(data.sessions)) {
+      return [];
+    }
+    
     return [...data.sessions].sort(
-      (a, b) => parseDate(a.date) - parseDate(b.date)
+      (a, b) => {
+        const dateA = parseDate(a.date);
+        const dateB = parseDate(b.date);
+        return dateA - dateB;
+      }
     );
   }, [data.sessions]);
 
   // 2️⃣ APPLY FILTER + SEARCH + SORT
   const filteredSessions = useMemo(() => {
+    if (!sortedSessions || sortedSessions.length === 0) {
+      return [];
+    }
+    
     return sortedSessions.map((group) => {
+      if (!group.details || !Array.isArray(group.details)) {
+        return { ...group, details: [] };
+      }
+      
       let details = group.details.map((s) => ({
         ...s,
-        status: s.status.charAt(0).toUpperCase() + s.status.slice(1), // normalize
-        mentor: s.mentorName || "Not Assigned",
-        student: s.name,
+        status: s.status ? (s.status.charAt(0).toUpperCase() + s.status.slice(1).toLowerCase()) : "Pending", // normalize
+        mentor: s.mentorName || s.mentor || "Not Assigned",
+        student: s.name || s.student || "Unknown",
+        subject: s.subject || "",
+        time: s.time || "",
+        plan: s.plan || "",
       }));
 
       if (filterStatus !== "All") {
@@ -66,16 +107,18 @@ const DoubtSolvingDashboard = ({ onView, data }) => {
 
         details = details.filter(
           (s) =>
-            s.student.toLowerCase().includes(q) ||
-            s.mentor.toLowerCase().includes(q) ||
-            s.subject.toLowerCase().includes(q)
+            (s.student && s.student.toLowerCase().includes(q)) ||
+            (s.mentor && s.mentor.toLowerCase().includes(q)) ||
+            (s.subject && s.subject.toLowerCase().includes(q))
         );
       }
 
       // Sort by time within group
-      details = [...details].sort((a, b) =>
-        sortAsc ? a.time.localeCompare(b.time) : b.time.localeCompare(a.time)
-      );
+      details = [...details].sort((a, b) => {
+        const timeA = a.time || "";
+        const timeB = b.time || "";
+        return sortAsc ? timeA.localeCompare(timeB) : timeB.localeCompare(timeA);
+      });
 
       return { ...group, details };
     });
@@ -194,67 +237,93 @@ const DoubtSolvingDashboard = ({ onView, data }) => {
         grouped.map((group, idx) => (
           <div key={idx} className="space-y-3">
             <div className="inline-block bg-gray-100 px-3 py-1 rounded text-sm font-medium text-gray-700 shadow-sm">
-              Date: {group.date}
+              Date: {group.date || "Unknown"}
             </div>
 
-            <div className="bg-white shadow-sm rounded-xl border border-gray-200 overflow-x-auto">
-              <table className="min-w-full text-sm text-gray-700">
-                <thead className="bg-gray-50 text-gray-600">
-                  <tr>
-                    <th className="p-3 text-left">Student</th>
-                    <th className="p-3 text-left hidden sm:table-cell">Mentor</th>
-                    <th className="p-3 text-left hidden md:table-cell">Subject</th>
-                    <th className="p-3 text-left">Time</th>
-                    <th className="p-3 text-left hidden lg:table-cell">Plan</th>
-                    <th className="p-3 text-left">Action</th>
-                    <th className="p-3 text-left">Status</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {group.details.map((s) => (
-                    <tr
-                      key={s._id}
-                      className={`border-t ${
-                        s.status === "Resolved"
-                          ? "bg-gray-100 text-gray-400"
-                          : "hover:bg-gray-50"
-                      }`}
-                    >
-                      <td className="p-3 font-medium">{s.student}</td>
-                      <td className="p-3 hidden sm:table-cell">{s.mentor}</td>
-                      <td className="p-3 hidden md:table-cell">{s.subject}</td>
-                      <td className="p-3">{s.time}</td>
-                      <td className="p-3 hidden lg:table-cell">{s.plan}</td>
-
-                      <td className="p-3">
-                        <button
-                          onClick={() =>
-                            onView({ ...s, _groupDate: group.date })
-                          }
-                          className={`underline text-sm ${
-                            s.status === "Resolved"
-                              ? "text-gray-400 cursor-not-allowed"
-                              : "text-red-600 hover:text-red-800"
-                          }`}
-                        >
-                          View
-                        </button>
-                      </td>
-
-                      <td className="p-3">
-                        <StatusPill value={s.status} />
-                      </td>
+            {group.details && group.details.length > 0 ? (
+              <div className="bg-white shadow-sm rounded-xl border border-gray-200 overflow-x-auto">
+                <table className="min-w-full text-sm text-gray-700">
+                  <thead className="bg-gray-50 text-gray-600">
+                    <tr>
+                      <th className="p-3 text-left">Student</th>
+                      <th className="p-3 text-left hidden sm:table-cell">Mentor</th>
+                      <th className="p-3 text-left hidden md:table-cell">Subject</th>
+                      <th className="p-3 text-left">Time</th>
+                      <th className="p-3 text-left hidden lg:table-cell">Plan</th>
+                      <th className="p-3 text-left">Action</th>
+                      <th className="p-3 text-left">Status</th>
                     </tr>
-                  ))}
-                </tbody>
+                  </thead>
 
-              </table>
-            </div>
+                  <tbody>
+                    {group.details.map((s, detailIdx) => (
+                      <tr
+                        key={s._id || s.id || detailIdx}
+                        className={`border-t ${
+                          s.status === "Resolved" || s.status === "Completed"
+                            ? "bg-gray-100 text-gray-400"
+                            : "hover:bg-gray-50"
+                        }`}
+                      >
+                        <td className="p-3 font-medium">{s.student || "Unknown"}</td>
+                        <td className="p-3 hidden sm:table-cell">{s.mentor || "Not Assigned"}</td>
+                        <td className="p-3 hidden md:table-cell">{s.subject || "—"}</td>
+                        <td className="p-3">{s.time || "—"}</td>
+                        <td className="p-3 hidden lg:table-cell">{s.plan || "—"}</td>
+
+                        <td className="p-3">
+                          <button
+                            onClick={() =>
+                              onView({
+                                ...s,
+                                _id: s._id || s.id,
+                                _groupDate: group.date,
+                                name: s.name || s.student,
+                                email: s.email || "",
+                                mobile: s.mobile || "",
+                                plan: s.plan || "N/A",
+                                subject: s.subject || "",
+                                topic: s.topic || "",
+                                mentor: s.mentor || s.mentorName || "",
+                                mentorName: s.mentorName || s.mentor || "",
+                                doubts: s.doubts || s.doubt || "",
+                                status: s.status || "Pending",
+                                time: s.time || "",
+                                file: s.file || null,
+                                createdAt: s.createdAt || null,
+                                updatedAt: s.updatedAt || null,
+                              })
+                            }
+                            disabled={s.status === "Resolved" || s.status === "Completed"}
+                            className={`underline text-sm ${
+                              s.status === "Resolved" || s.status === "Completed"
+                                ? "text-gray-400 cursor-not-allowed"
+                                : "text-red-600 hover:text-red-800"
+                            }`}
+                          >
+                            View
+                          </button>
+                        </td>
+
+                        <td className="p-3">
+                          <StatusPill value={s.status || "Pending"} />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+
+                </table>
+              </div>
+            ) : (
+              <p className="text-center text-gray-500 italic py-4">No sessions for this date.</p>
+            )}
           </div>
         ))
       ) : (
-        <p className="text-center text-gray-500 italic">No sessions found.</p>
+        <div className="text-center py-12">
+          <p className="text-gray-500 text-lg mb-2">No doubt solving sessions found.</p>
+          <p className="text-gray-400 text-sm">Try adjusting your filters or check back later.</p>
+        </div>
       )}
     </div>
   );
