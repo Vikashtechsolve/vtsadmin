@@ -29,6 +29,11 @@ import Mentors from "./pages/ManageVTS/Mentors";
 import JoinUs from "./pages/ManageVTS/JoinUs";
 import ContactUs from "./pages/ManageVTS/ContactUs";
 import resumeReviewData from "./data/resumeReviewData.json";
+import LmsDashboard from "./pages/LmsPortal/LmsDashboard";
+import LmsLayout from "./LmsLayout";
+import Playlists from "./pages/LmsPortal/Playlist/Playlists";
+import PlaylistDetails from "./pages/LmsPortal/Playlist/PlaylistDetails";
+import BlogsSection from "./pages/LmsPortal/Blogs/BlogsSection";
 
 const AppLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -126,6 +131,50 @@ function App() {
 
           <Route path="/programs/resume-review" element={<ResumeReviewMain />}/>
           <Route path="/programs/resume-review/view/:id" element={<ResumeReviewMain />}/>
+
+          {/* <Route element={<LmsLayout />}> */}
+  <Route
+    path="/lmsDashboard"
+    element={
+      <ProtectedRoute>
+        <LmsDashboard />
+      </ProtectedRoute>
+    }
+  />
+
+  {/* ✅ LMS Playlists */}
+  <Route
+    path="/lmsDashboard/playlists"
+    element={
+      <ProtectedRoute>
+        <Playlists />
+      </ProtectedRoute>
+    }
+  />
+
+  <Route
+    path="/lmsDashboard/playlists/:id"
+    element={
+      <ProtectedRoute>
+        <PlaylistDetails />
+      </ProtectedRoute>
+    }
+  />
+
+   <Route
+    path="/lmsDashboard/blogsSection"
+    element={
+      <ProtectedRoute>
+        <BlogsSection />
+      </ProtectedRoute>
+    }
+  />
+
+  
+{/* </Route> */}
+
+
+          
 
           {/* Manage VTS Routes */}
           <Route path="/manage-vts" element={<ManageVTS />}>

@@ -36,7 +36,7 @@ const Sidebar = ({ isOpen = false, onClose }) => {
       name: "Our Products",
       icon: <Laptop size={18} />,
       children: [
-        { name: "LMS Portal", path: "/products/lms" },
+        { name: "LMS Portal", path: "/lmsDashboard" },
         { name: "Interview Portal", path: "/products/interview" },
         { name: "Manpower Management", path: "/products/manpower" },
       ],
