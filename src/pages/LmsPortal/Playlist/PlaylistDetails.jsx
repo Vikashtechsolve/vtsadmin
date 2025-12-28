@@ -6,13 +6,21 @@ import RightActivitySidebar from "../RightActivitySidebar";
 import LmsHeader from "../LmsHeader";
 import { Trash2, Pencil, Plus } from "lucide-react";
 import GraduationCapIcon from "../icon";
+import { useNavigate } from "react-router-dom";
+
+// import PlaylistTabs from "./PlaylistTabs/PlaylistTabs";
 
 export default function PlaylistDetails() {
   const { id } = useParams();
   const playlist = playlists.find((p) => p.id === id);
-
+  
+  
   const [openModuleId, setOpenModuleId] = useState(null);
   const [openMenuId, setOpenMenuId] = useState(null);
+  // const [activeTab, setActiveTab] = useState("videos");
+  
+  
+  const navigate = useNavigate();
 
   const menuRef = useRef(null); // 👈 menu reference
 
@@ -106,10 +114,12 @@ export default function PlaylistDetails() {
 
               {/* SESSIONS */}
               {openModuleId === module.id && (
-                <div className="mt-3 w-full space-y-3">
+                <div 
+                 className="mt-3 w-full space-y-3">
                   {module.sessions.map((session) => (
                     <div
                       key={session.id}
+                      onClick={() => navigate(`/lmsDashboard/playlists/${playlist.id}/session/${session.id}`)}
                       className="flex justify-between text-sm items-center border border-gray-400 rounded-xl p-2 bg-white"
                     >
                       <div>
@@ -123,15 +133,14 @@ export default function PlaylistDetails() {
                         </p>
                       </div>
 
-                     <div className="flex sm:flex-row gap-2">
-  <button className="border cursor-pointer border-gray-400 flex gap-1 px-2 py-1 rounded text-xs text-gray-400 w-full sm:w-auto justify-center items-center hover:bg-blue-600  hover:text-white"  >
-    <Pencil size={12} /> Edit 
-  </button>
-  <button className="border cursor-pointer border-gray-400 flex gap-2 px-3 py-2 rounded text-xs text-gray-400 w-full sm:w-auto justify-center  hover:bg-red-600  hover:text-white">
-    <Trash2 size={12} /> Delete 
-  </button>
-</div>
-
+                      <div className="flex sm:flex-row gap-2">
+                        <button className="border cursor-pointer border-gray-400 flex gap-1 px-2 py-1 rounded text-xs text-gray-400 w-full sm:w-auto justify-center items-center hover:bg-blue-600  hover:text-white">
+                          <Pencil size={12} /> Edit
+                        </button>
+                        <button className="border cursor-pointer border-gray-400 flex gap-2 px-3 py-2 rounded text-xs text-gray-400 w-full sm:w-auto justify-center  hover:bg-red-600  hover:text-white">
+                          <Trash2 size={12} /> Delete
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>

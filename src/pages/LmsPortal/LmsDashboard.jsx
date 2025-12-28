@@ -64,7 +64,7 @@ const LmsDashboard = () => {
             </div>
 
             {/* Welcome Card */}
-            <div className="relative bg-red-700 text-left lg:text-center text-white rounded-xl p-6 lg:p-8 shadow-md w-full overflow-hidden">
+            <div className="relative bg-red-700 text-left lg:text-center text-white rounded-xl p-6 lg:p-8 shadow-md w-120 overflow-hidden">
               {/* Text */}
               <div className="lg:w-full pr-20 lg:pr-0">
                 <h2 className="text-lg lg:text-2xl font-semibold mb-2">

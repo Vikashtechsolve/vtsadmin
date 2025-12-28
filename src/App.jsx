@@ -34,6 +34,9 @@ import LmsLayout from "./LmsLayout";
 import Playlists from "./pages/LmsPortal/Playlist/Playlists";
 import PlaylistDetails from "./pages/LmsPortal/Playlist/PlaylistDetails";
 import BlogsSection from "./pages/LmsPortal/Blogs/BlogsSection";
+import SessionDetails from "./pages/LmsPortal/Playlist/PlaylistTabs/SessionDetails";
+import QuestionForm from "./pages/LmsPortal/Playlist/PlaylistTabs/QuestionForm";
+import TabRenderer from "./pages/LmsPortal/Playlist/PlaylistTabs/TabRenderer";
 
 const AppLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -126,65 +129,96 @@ function App() {
             }
           />
           <Route path="/programs/doubt-solving" element={<DoubtSolving />} />
-          <Route path="/programs/doubt-solving/view/:id" element={<DoubtSolving />} />
-          <Route path="/programs/mentorship" element={<MentorshipDashboard />} />
+          <Route
+            path="/programs/doubt-solving/view/:id"
+            element={<DoubtSolving />}
+          />
+          <Route
+            path="/programs/mentorship"
+            element={<MentorshipDashboard />}
+          />
 
-          <Route path="/programs/resume-review" element={<ResumeReviewMain />}/>
-          <Route path="/programs/resume-review/view/:id" element={<ResumeReviewMain />}/>
+          <Route
+            path="/programs/resume-review"
+            element={<ResumeReviewMain />}
+          />
+          <Route
+            path="/programs/resume-review/view/:id"
+            element={<ResumeReviewMain />}
+          />
 
           {/* <Route element={<LmsLayout />}> */}
-  <Route
-    path="/lmsDashboard"
-    element={
-      <ProtectedRoute>
-        <LmsDashboard />
-      </ProtectedRoute>
-    }
-  />
+          <Route
+            path="/lmsDashboard"
+            element={
+              <ProtectedRoute>
+                <LmsDashboard />
+              </ProtectedRoute>
+            }
+          />
 
-  {/* ✅ LMS Playlists */}
-  <Route
-    path="/lmsDashboard/playlists"
-    element={
-      <ProtectedRoute>
-        <Playlists />
-      </ProtectedRoute>
-    }
-  />
+          {/* LMS Playlists */}
+          <Route
+            path="/lmsDashboard/playlists"
+            element={
+              <ProtectedRoute>
+                <Playlists />
+              </ProtectedRoute>
+            }
+          />
 
-  <Route
-    path="/lmsDashboard/playlists/:id"
-    element={
-      <ProtectedRoute>
-        <PlaylistDetails />
-      </ProtectedRoute>
-    }
-  />
+          <Route
+            path="/lmsDashboard/playlists/:id"
+            element={
+              <ProtectedRoute>
+                <PlaylistDetails />
+              </ProtectedRoute>
+            }
+          />
 
-   <Route
-    path="/lmsDashboard/blogsSection"
-    element={
-      <ProtectedRoute>
-        <BlogsSection />
-      </ProtectedRoute>
-    }
-  />
+          <Route
+            path="/lmsDashboard/playlists/:playlistId/session/:sid"
+            element={
+              <ProtectedRoute>
+                <SessionDetails />
+              </ProtectedRoute>
+            }
+          />
 
-  
-{/* </Route> */}
+          <Route index element={<TabRenderer />} />
 
+          <Route
+            path="/lmsDashboard/playlists/:playlistId/session/:sid/question-form"
+            element={
+              <ProtectedRoute>
+                <QuestionForm />
+              </ProtectedRoute>
+            }
+          />
 
-          
+          <Route
+            path="/lmsDashboard/blogsSection"
+            element={
+              <ProtectedRoute>
+                <BlogsSection />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* </Route> */}
 
           {/* Manage VTS Routes */}
           <Route path="/manage-vts" element={<ManageVTS />}>
-            <Route index element={<Navigate to="/manage-vts/blogs" replace />} />
+            <Route
+              index
+              element={<Navigate to="/manage-vts/blogs" replace />}
+            />
             <Route path="blogs" element={<Blogs />} />
             <Route path="mentors" element={<Mentors />} />
             <Route path="joinus" element={<JoinUs />} />
             <Route path="contact" element={<ContactUs />} />
           </Route>
-         
+
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
