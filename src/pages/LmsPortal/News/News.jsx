@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
 import { Plus, ArrowRight } from "lucide-react";
 import { fetchNews } from "../API/newsApi";
+import { useNavigate } from "react-router-dom";
+
 
 const News = () => {
   const [news, setNews] = useState([]);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchNews().then(setNews);
@@ -83,7 +87,8 @@ const News = () => {
 
       {/* Manage News */}
       <div className="mt-6">
-        <button className="flex items-center gap-2 px-5 py-2 bg-[#F2F2F2] rounded-lg shadow-lg hover:bg-gray-50">
+        <button onClick={() => navigate("/lmsDashboard/NewsSection")}
+         className="flex items-center gap-2 px-5 py-2 bg-[#F2F2F2] rounded-lg shadow-lg hover:bg-gray-50">
           Manage News
           <ArrowRight className="w-4 h-4 text-red-600" />
         </button>

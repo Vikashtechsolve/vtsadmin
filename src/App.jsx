@@ -37,6 +37,7 @@ import BlogsSection from "./pages/LmsPortal/Blogs/BlogsSection";
 import SessionDetails from "./pages/LmsPortal/Playlist/PlaylistTabs/SessionDetails";
 import QuestionForm from "./pages/LmsPortal/Playlist/PlaylistTabs/QuestionForm";
 import TabRenderer from "./pages/LmsPortal/Playlist/PlaylistTabs/TabRenderer";
+import NewsSection from "./pages/LmsPortal/News/NewsSection";
 
 const AppLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -201,6 +202,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <BlogsSection />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/lmsDashboard/NewsSection"
+            element={
+              <ProtectedRoute>
+                <NewsSection />
               </ProtectedRoute>
             }
           />
