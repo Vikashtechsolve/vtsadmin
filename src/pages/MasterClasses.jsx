@@ -8,12 +8,14 @@ import MasterClassRightPanel from "../components/MasterClassRightPanel";
 import MasterClassIntroCard from "../components/MasterClassIntroCard";
 import AddMasterClassForm from "../components/AddMasterClassForm";
 import EditMasterClassForm from "../components/EditMasterClassForm";
+import { vtsApi } from "../services/apiService";
 
 const MasterClasses = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showForm, setShowForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
@@ -21,12 +23,12 @@ const MasterClasses = () => {
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [pastEvents, setPastEvents] = useState([]);
 
-  // ✅ Load Masterclass Data
+  // ✅ Load Masterclass Data with Admin Token
   useEffect(() => {
     const loadData = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/masterclass`);
-        const result = await res.json();
+        setLoading(true);
+        const result = await vtsApi.get('/api/masterclass');
 
         if (result.success && Array.isArray(result.data)) {
           setData(result.data);
@@ -43,6 +45,8 @@ const MasterClasses = () => {
         }
       } catch (err) {
         console.error("Error fetching masterclasses:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -61,10 +65,13 @@ const MasterClasses = () => {
     );
   };
 
-  if (!data.length)
+  if (loading)
     return (
       <div className="flex justify-center items-center min-h-screen text-gray-600">
-        Loading Master Classes...
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-red-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p>Loading Master Classes...</p>
+        </div>
       </div>
     );
 

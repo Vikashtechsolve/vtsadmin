@@ -1,9 +1,11 @@
 // src/components/EditMasterClassForm.jsx
 import React, { useState, useEffect } from "react";
+import { vtsApi } from "../services/apiService";
 
 const EditMasterClassForm = ({ isOpen, onClose, eventData, onSave }) => {
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   // ✅ Populate form when eventData changes
   useEffect(() => {
@@ -19,6 +21,7 @@ const EditMasterClassForm = ({ isOpen, onClose, eventData, onSave }) => {
         bannerImage: eventData.bannerImage || null,
       });
     }
+    setError(""); // Clear error when form opens
   }, [eventData]);
 
   if (!isOpen) return null; // hide modal if not open
@@ -30,19 +33,20 @@ const EditMasterClassForm = ({ isOpen, onClose, eventData, onSave }) => {
       ...prev,
       [name]: files ? files[0] : value,
     }));
+    setError(""); // Clear error on input change
   };
 
   // ✅ Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!eventData?._id) {
-      alert("Event ID is missing!");
+      setError("Event ID is missing!");
       return;
     }
 
     setLoading(true);
+    setError("");
     try {
-      const apiUrl = `${import.meta.env.VITE_API_URL}/api/masterclass/${eventData._id}`;
       const formPayload = new FormData();
 
       // Append fields
@@ -59,23 +63,18 @@ const EditMasterClassForm = ({ isOpen, onClose, eventData, onSave }) => {
         formPayload.append("bannerImage", formData.bannerImage);
       }
 
-      const res = await fetch(apiUrl, {
-        method: "PUT",
-        body: formPayload,
-      });
+      const result = await vtsApi.putFormData(`/api/masterclass/${eventData._id}`, formPayload);
 
-      const result = await res.json();
-
-      if (res.ok) {
+      if (result.success || result.data) {
         alert("✅ Event updated successfully!");
-        onSave(result);
+        onSave(result.data || result);
         onClose();
       } else {
-        alert(`❌ Error: ${result.message || "Failed to update event."}`);
+        setError(result.message || "Failed to update event.");
       }
     } catch (error) {
       console.error("Error updating masterclass:", error);
-      alert("❌ Something went wrong while updating the event.");
+      setError(error.message || "❌ Something went wrong while updating the event.");
     } finally {
       setLoading(false);
     }
@@ -100,6 +99,13 @@ const EditMasterClassForm = ({ isOpen, onClose, eventData, onSave }) => {
         <p className="text-center text-gray-500 text-sm mb-6">
           Update event details below.
         </p>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+            {error}
+          </div>
+        )}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">

@@ -3,6 +3,7 @@ import { X, CalendarDays, Clock, Download, User, Mail, Phone, BookOpen, CheckCir
 import Calendar from "react-calendar";
 import { motion, AnimatePresence } from "framer-motion";
 import "react-calendar/dist/Calendar.css";
+import { vtsApi } from "../../services/apiService";
 
 const MentorshipViewModal = ({ session, onClose, mentorsList, onUpdate }) => {
   const [form, setForm] = useState(null);
@@ -134,32 +135,31 @@ const MentorshipViewModal = ({ session, onClose, mentorsList, onUpdate }) => {
     return inputDate;
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    // Prevent double submission
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    if (loading) return; // Prevent double clicks
+    
     setLoading(true);
     setError("");
     setSuccess("");
 
     try {
-      const payload = {
-        mentorName: form.mentor,
-        query: form.query,
-        status: form.status.toLowerCase(),
-        date: formatDateForBackend(form.date),
-        time: form.time,
-      };
+      // Backend expects FormData (multipart/form-data) because of uploadMentorFile middleware
+      const formData = new FormData();
+      formData.append("mentorName", form.mentor || "");
+      formData.append("query", form.query || "");
+      formData.append("status", form.status.toLowerCase() || "pending");
+      formData.append("date", formatDateForBackend(form.date) || "");
+      formData.append("time", form.time || "");
 
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/mentorship/${form.id}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
+      const result = await vtsApi.putFormData(`/api/mentorship/${form.id}`, formData);
 
-      const json = await res.json();
-
-      if (json.success || res.ok) {
+      if (result.success || result.data) {
         setSuccess("Mentorship session updated successfully!");
         
         if (onUpdate) {
@@ -179,7 +179,7 @@ const MentorshipViewModal = ({ session, onClose, mentorsList, onUpdate }) => {
           }, 1000);
         }
       } else {
-        setError(json.message || "Failed to update session");
+        setError(result.message || "Failed to update session");
       }
     } catch (e) {
       console.error("Error updating:", e);
@@ -299,7 +299,7 @@ const MentorshipViewModal = ({ session, onClose, mentorsList, onUpdate }) => {
                     onClick={() => {
                       const fileUrl = form.file.startsWith("http")
                         ? form.file
-                        : `${import.meta.env.VITE_API_URL}/${form.file}`;
+                        : `${import.meta.env.VITE_VTS_API_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}/${form.file}`;
                       window.open(fileUrl, "_blank");
                     }}
                     className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#ED0331] to-[#87021C] text-white rounded-lg hover:opacity-90 transition shrink-0"
@@ -426,6 +426,7 @@ const MentorshipViewModal = ({ session, onClose, mentorsList, onUpdate }) => {
             </button>
 
             <button
+              type="button"
               onClick={handleSubmit}
               disabled={loading}
               className="px-5 py-2.5 rounded-lg bg-gradient-to-r from-[#ED0331] to-[#87021C] text-white hover:opacity-90 transition font-medium disabled:opacity-50 flex items-center gap-2"

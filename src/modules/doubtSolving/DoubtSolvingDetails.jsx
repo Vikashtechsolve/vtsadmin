@@ -3,6 +3,7 @@ import { X, CalendarDays, Download, User, Mail, Phone, Clock, BookOpen, CheckCir
 import Calendar from "react-calendar";
 import { motion, AnimatePresence } from "framer-motion";
 import "react-calendar/dist/Calendar.css";
+import { vtsApi } from "../../services/apiService";
 
 const DoubtSolvingDetails = ({ session, onBack, onSubmit }) => {
   const [editableSession, setEditableSession] = useState(null);
@@ -110,7 +111,15 @@ const DoubtSolvingDetails = ({ session, onBack, onSubmit }) => {
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    // Prevent double submission
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    if (loading) return; // Prevent double clicks
+    
     setLoading(true);
     setError("");
     setSuccess("");
@@ -129,27 +138,26 @@ const DoubtSolvingDetails = ({ session, onBack, onSubmit }) => {
         }
       }
 
-      const payload = {
-        subject: editableSession.subject,
-        doubt: editableSession.doubts,
-        mentorName: editableSession.mentor,
-        status: editableSession.status?.toLowerCase(),
-        date: apiDate,
-        time: editableSession.time,
-      };
+      // Validate ID
+      if (!editableSession._id) {
+        setError("Session ID is missing. Cannot update.");
+        setLoading(false);
+        return;
+      }
 
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/doubts/${editableSession._id}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
+      // Backend expects FormData (multipart/form-data) because of uploadDoubtFile middleware
+      const formData = new FormData();
+      formData.append("subject", editableSession.subject || "");
+      formData.append("doubt", editableSession.doubts || "");
+      formData.append("mentorName", editableSession.mentor || "");
+      formData.append("status", editableSession.status?.toLowerCase() || "pending");
+      formData.append("date", apiDate || "");
+      formData.append("time", editableSession.time || "");
 
-      const result = await res.json();
+      console.log("Updating doubt session with ID:", editableSession._id);
+      const result = await vtsApi.putFormData(`/api/doubts/${editableSession._id}`, formData);
 
-      if (res.ok) {
+      if (result.success || result.data) {
         setSuccess("Doubt session updated successfully!");
         
         // Update the session with new data
@@ -268,7 +276,7 @@ const DoubtSolvingDetails = ({ session, onBack, onSubmit }) => {
                     onClick={() => {
                       const fileUrl = editableSession.file.startsWith("http")
                         ? editableSession.file
-                        : `${import.meta.env.VITE_API_URL}/${editableSession.file}`;
+                        : `${import.meta.env.VITE_VTS_API_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}/${editableSession.file}`;
                       window.open(fileUrl, "_blank");
                     }}
                     className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#ED0331] to-[#87021C] text-white rounded-lg hover:opacity-90 transition shrink-0"
@@ -412,6 +420,7 @@ const DoubtSolvingDetails = ({ session, onBack, onSubmit }) => {
             </button>
 
             <button
+              type="button"
               onClick={handleSubmit}
               disabled={loading}
               className="px-5 py-2.5 rounded-lg bg-gradient-to-r from-[#ED0331] to-[#87021C] text-white hover:opacity-90 transition font-medium disabled:opacity-50 flex items-center gap-2"

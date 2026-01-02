@@ -3,6 +3,7 @@ import { X, CalendarDays, Download, User, Mail, Phone, BookOpen, CheckCircle, Fi
 import Calendar from "react-calendar";
 import { motion, AnimatePresence } from "framer-motion";
 import "react-calendar/dist/Calendar.css";
+import { vtsApi } from "../../services/apiService";
 
 const ResumeViewModal = ({ session, onClose, onUpdate }) => {
   const [form, setForm] = useState(null);
@@ -115,29 +116,28 @@ const ResumeViewModal = ({ session, onClose, onUpdate }) => {
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    // Prevent double submission
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    if (loading) return; // Prevent double clicks
+    
     setLoading(true);
     setError("");
     setSuccess("");
 
     try {
-      const payload = {
-        mentorName: form.mentorName,
-        status: form.status.toLowerCase(),
-      };
+      // Backend expects FormData (multipart/form-data) because of uploadResumeFile middleware
+      const formData = new FormData();
+      formData.append("mentorName", form.mentorName || "");
+      formData.append("status", form.status.toLowerCase() || "pending");
 
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/resume-review/${form._id}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
+      const result = await vtsApi.putFormData(`/api/resume-review/${form._id}`, formData);
 
-      const json = await res.json();
-
-      if (json.success || res.ok) {
+      if (result.success || result.data) {
         setSuccess("Resume review updated successfully!");
         
         if (onUpdate) {
@@ -155,7 +155,7 @@ const ResumeViewModal = ({ session, onClose, onUpdate }) => {
           }, 1000);
         }
       } else {
-        setError(json.message || "Failed to update resume review");
+        setError(result.message || "Failed to update resume review");
       }
     } catch (err) {
       console.error("Update Error:", err);
@@ -260,7 +260,7 @@ const ResumeViewModal = ({ session, onClose, onUpdate }) => {
                     onClick={() => {
                       const fileUrl = form.resume.startsWith("http")
                         ? form.resume
-                        : `${import.meta.env.VITE_API_URL}/${form.resume}`;
+                        : `${import.meta.env.VITE_VTS_API_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}/${form.resume}`;
                       window.open(fileUrl, "_blank");
                     }}
                     className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#ED0331] to-[#87021C] text-white rounded-lg hover:opacity-90 transition shrink-0"
@@ -400,6 +400,7 @@ const ResumeViewModal = ({ session, onClose, onUpdate }) => {
             </button>
 
             <button
+              type="button"
               onClick={handleSubmit}
               disabled={loading}
               className="px-5 py-2.5 rounded-lg bg-gradient-to-r from-[#ED0331] to-[#87021C] text-white hover:opacity-90 transition font-medium disabled:opacity-50 flex items-center gap-2"

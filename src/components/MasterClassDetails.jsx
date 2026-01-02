@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { vtsApi } from "../services/apiService";
 
 const MasterClassDetails = ({ onBack }) => {
   const { id } = useParams();
@@ -7,14 +8,12 @@ const MasterClassDetails = ({ onBack }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // ✅ Fetch event + students by ID
+  // ✅ Fetch event + students by ID with Admin Token
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/masterclass/${id}/students`
-        );
-        const data = await res.json();
+        setLoading(true);
+        const data = await vtsApi.get(`/api/masterclass/${id}/students`);
 
         if (data && data.masterclassId) {
           setEventData(data);
@@ -22,6 +21,7 @@ const MasterClassDetails = ({ onBack }) => {
           setError("Event not found or invalid response");
         }
       } catch (err) {
+        console.error("Error fetching masterclass details:", err);
         setError("Failed to load event details");
       } finally {
         setLoading(false);

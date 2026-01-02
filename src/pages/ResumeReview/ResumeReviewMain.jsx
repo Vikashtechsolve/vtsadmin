@@ -6,6 +6,7 @@ import { Filter, ArrowUpDown } from "lucide-react";
 import ResumeViewModal from "./ResumeViewModal";
 import OverviewImage from "../../assets/resume.png";
 import RightPanel from "./RightPanel";
+import { vtsApi } from "../../services/apiService";
 
 // 🔹 Status Pill Component
 const StatusPill = ({ status }) => {
@@ -48,19 +49,20 @@ const ResumeReviewMain = () => {
 
   const statuses = ["All", "Live", "Completed", "Scheduled", "Pending"];
 
-  // 🔥 Fetch API Data
+  // 🔥 Fetch API Data with Admin Token
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/resume-review`);
-        const json = await res.json();
-        if (json.success) {
-          setApiData(json.sessions);
+        setLoading(true);
+        const result = await vtsApi.get('/api/resume-review');
+        if (result.success && result.sessions) {
+          setApiData(result.sessions);
         }
       } catch (err) {
         console.error("Error fetching resume review data:", err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     fetchData();
   }, []);

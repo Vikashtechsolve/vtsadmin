@@ -48,34 +48,35 @@ const LoginPage = () => {
     }
 
     try {
-      const loginUrl = `${API_BASE_URL}/api/auth/login`;
-      console.log("🌐 Using API:", loginUrl);
+      // ✅ Use admin login endpoint
+      const loginUrl = `${API_BASE_URL}/api/admin/login`;
+      console.log("🌐 Using Admin API:", loginUrl);
 
       const response = await axios.post(
         loginUrl,
         { username: username.trim(), password },
         {
-          withCredentials: true,
           headers: { "Content-Type": "application/json" },
         }
       );
 
       console.log("✅ Server response:", response.data);
 
-      // Extract token and role safely
-      const token =
-        response.data?.token ||
-        response.data?.accessToken ||
-        response.data?.jwt;
-      const role = response.data?.user?.role;
+      // Extract admin tokens
+      const accessToken = response.data?.accessToken;
+      const refreshToken = response.data?.refreshToken;
+      const admin = response.data?.admin;
 
-      if (token) {
-        // ✅ Store JWT
-        sessionStorage.setItem("token", token);
+      if (accessToken && refreshToken) {
+        // ✅ Store admin tokens
+        sessionStorage.setItem("adminAccessToken", accessToken);
+        sessionStorage.setItem("adminRefreshToken", refreshToken);
+        sessionStorage.setItem("token", accessToken); // Legacy support
 
-        // 🧭 Redirect based on role
+        // 🧭 Redirect based on admin role
         startTransition(() => {
-          if (role === "admin") {
+          const role = admin?.role || "admin";
+          if (role === "admin" || role === "super_admin") {
             navigate("/");
           } else {
             navigate("/unauthorized");
