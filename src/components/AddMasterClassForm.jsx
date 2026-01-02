@@ -1,5 +1,6 @@
 // src/components/AddMasterClassForm.jsx
 import React, { useState } from "react";
+import { vtsApi } from "../services/apiService";
 
 const AddMasterClassForm = ({ isOpen, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
@@ -12,6 +13,7 @@ const AddMasterClassForm = ({ isOpen, onClose, onSubmit }) => {
     meetingurl: "",
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   if (!isOpen) return null; // Hide modal when not open
 
@@ -22,15 +24,16 @@ const AddMasterClassForm = ({ isOpen, onClose, onSubmit }) => {
       ...prev,
       [name]: files ? files[0] : value,
     }));
+    setError(""); // Clear error on input change
   };
 
   // ✅ Handle Form Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
     try {
       setLoading(true);
-      const apiUrl = `${import.meta.env.VITE_API_URL}/api/masterclass`;
 
       // Prepare FormData for multipart upload
       const formPayload = new FormData();
@@ -44,23 +47,28 @@ const AddMasterClassForm = ({ isOpen, onClose, onSubmit }) => {
         formPayload.append("bannerImage", formData.banner);
       }
 
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        body: formPayload,
-      });
+      const result = await vtsApi.postFormData('/api/masterclass', formPayload);
 
-      const result = await response.json();
-
-      if (response.ok) {
+      if (result.success || result.data) {
         alert("✅ Masterclass added successfully!");
-        if (onSubmit) onSubmit(result);
+        if (onSubmit) onSubmit(result.data || result);
+        // Reset form
+        setFormData({
+          title: "",
+          subtitle: "",
+          mentor: "",
+          date: "",
+          time: "",
+          banner: null,
+          meetingurl: "",
+        });
         onClose();
       } else {
-        alert(`❌ Error: ${result.message || "Something went wrong"}`);
+        setError(result.message || "Failed to add masterclass");
       }
     } catch (error) {
       console.error("Error adding masterclass:", error);
-      alert("❌ Failed to add masterclass. Please try again.");
+      setError(error.message || "❌ Failed to add masterclass. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -85,6 +93,13 @@ const AddMasterClassForm = ({ isOpen, onClose, onSubmit }) => {
         <p className="text-center text-gray-500 text-sm mb-6">
           Fill in the details below to create a new upcoming event
         </p>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+            {error}
+          </div>
+        )}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">

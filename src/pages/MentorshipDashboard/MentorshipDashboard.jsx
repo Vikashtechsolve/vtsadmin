@@ -2,18 +2,19 @@ import React, { useEffect, useState } from "react";
 import DashboardMain from "./DashboardMain";
 import RightPanel from "./RightPanel";
 import localData from "../../data/mentorshipData.json";
+import { vtsApi } from "../../services/apiService";
 
 const MentorshipDashboard = () => {
   const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch("/api/mentorship");
+        setLoading(true);
+        const apiData = await vtsApi.get('/api/mentorship');
 
-        if (res.ok) {
-          const apiData = await res.json();
-
+        if (apiData && apiData.sessions) {
           // --- TRANSFORM API DATA → UI FORMAT ---
           const transformed = {
             sessions: apiData.sessions.map((group) => {
@@ -58,12 +59,25 @@ const MentorshipDashboard = () => {
           setData(localData); // fallback to local JSON
         }
       } catch (err) {
+        console.error("Error fetching mentorship data:", err);
         setData(localData); // fallback
+      } finally {
+        setLoading(false);
       }
     };
 
     load();
   }, []);
+
+  if (loading || !data)
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-red-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading mentorship data...</p>
+        </div>
+      </div>
+    );
 
   if (!data)
     return (

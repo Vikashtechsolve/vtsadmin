@@ -4,8 +4,7 @@ import DoubtSolvingDashboard from "./DoubtSolvingDashboard";
 import DoubtSolvingDetails from "./DoubtSolvingDetails";
 import DoubtSolvingRightPanel from "./DoubtSolvingRightPanel";
 import localData from "../../data/doubtSolvingData.json";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { vtsApi } from "../../services/apiService";
 
 const DoubtSolving = () => {
   const [data, setData] = useState({ sessions: [], mentors: [], highlights: [] });
@@ -14,12 +13,12 @@ const DoubtSolving = () => {
   const [selectedSession, setSelectedSession] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  // Fetch data from API
+  // Fetch data from API with Admin Token
   useEffect(() => {
     const fetchDoubts = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/doubts`);
-        const result = await response.json();
+        setLoading(true);
+        const result = await vtsApi.get('/api/doubts');
 
         if (result?.sessions && Array.isArray(result.sessions)) {
           // Transform API data to match expected format

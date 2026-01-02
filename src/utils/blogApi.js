@@ -4,6 +4,7 @@
  * ============================================================================
  * 
  * All blog-related API endpoints are consolidated here.
+ * Uses admin authentication token that works for both backends.
  * 
  * IMPORTANT FOR SWAGGER DOCUMENTATION:
  * - All endpoints use base path: /api/blogs
@@ -22,7 +23,7 @@
  * ============================================================================
  */
 
-const API_URL = import.meta.env.VITE_API_URL;
+import { vtsApi } from '../services/apiService';
 
 /**
  * Get all blogs
@@ -32,12 +33,9 @@ const API_URL = import.meta.env.VITE_API_URL;
 export const getBlogs = async (params = {}) => {
   try {
     const queryString = new URLSearchParams(params).toString();
-    const url = queryString 
-      ? `${API_URL}/api/blogs?${queryString}`
-      : `${API_URL}/api/blogs`;
+    const endpoint = queryString ? `/api/blogs?${queryString}` : '/api/blogs';
     
-    const response = await fetch(url);
-    const result = await response.json();
+    const result = await vtsApi.get(endpoint);
     
     if (result.success && result.data) {
       return {
@@ -71,8 +69,7 @@ export const getBlogs = async (params = {}) => {
  */
 export const getBlogById = async (id) => {
   try {
-    const response = await fetch(`${API_URL}/api/blogs/${id}`);
-    const result = await response.json();
+    const result = await vtsApi.get(`/api/blogs/${id}`);
     
     if (result.success && result.data) {
       return {
@@ -103,14 +100,9 @@ export const getBlogById = async (id) => {
  */
 export const createBlog = async (formData) => {
   try {
-    const response = await fetch(`${API_URL}/api/blogs`, {
-      method: "POST",
-      body: formData,
-    });
+    const result = await vtsApi.postFormData('/api/blogs', formData);
     
-    const result = await response.json();
-    
-    if (response.ok || result.success) {
+    if (result.success) {
       return {
         success: true,
         data: result.data || result,
@@ -139,14 +131,9 @@ export const createBlog = async (formData) => {
  */
 export const updateBlog = async (id, formData) => {
   try {
-    const response = await fetch(`${API_URL}/api/blogs/${id}`, {
-      method: "PUT",
-      body: formData,
-    });
+    const result = await vtsApi.putFormData(`/api/blogs/${id}`, formData);
     
-    const result = await response.json();
-    
-    if (response.ok || result.success) {
+    if (result.success) {
       return {
         success: true,
         data: result.data || result,
@@ -174,13 +161,9 @@ export const updateBlog = async (id, formData) => {
  */
 export const deleteBlog = async (id) => {
   try {
-    const response = await fetch(`${API_URL}/api/blogs/${id}`, {
-      method: "DELETE",
-    });
+    const result = await vtsApi.delete(`/api/blogs/${id}`);
     
-    const result = await response.json();
-    
-    if (response.ok || result.success) {
+    if (result.success) {
       return {
         success: true,
         message: result.message || "Blog deleted successfully",
