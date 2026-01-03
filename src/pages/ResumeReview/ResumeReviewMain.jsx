@@ -51,20 +51,36 @@ const ResumeReviewMain = () => {
 
   // 🔥 Fetch API Data with Admin Token
   useEffect(() => {
+    let isCancelled = false; // Flag to track if component unmounted
+
     const fetchData = async () => {
       try {
         setLoading(true);
         const result = await vtsApi.get('/api/resume-review');
+
+        // Don't update state if component unmounted (StrictMode cleanup)
+        if (isCancelled) return;
+
         if (result.success && result.sessions) {
           setApiData(result.sessions);
         }
       } catch (err) {
-        console.error("Error fetching resume review data:", err);
+        if (!isCancelled) {
+          console.error("Error fetching resume review data:", err);
+        }
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
+
     fetchData();
+
+    // Cleanup function: runs when component unmounts or before re-running effect
+    return () => {
+      isCancelled = true;
+    };
   }, []);
 
   // 🔸 Close Filter Menu on Outside Click

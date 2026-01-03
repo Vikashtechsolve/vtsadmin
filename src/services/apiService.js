@@ -121,13 +121,36 @@ export const apiRequest = async (backend, endpoint, options = {}) => {
     }
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `API request failed: ${response.statusText}`);
+      // Try to parse error response
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch (e) {
+        // If response is not JSON, get text
+        const text = await response.text();
+        errorData = { message: text || `API request failed: ${response.statusText}` };
+      }
+      
+      // Log detailed error for debugging
+      console.error(`API Request Failed (${backend}):`, {
+        endpoint: `${baseURL}${endpoint}`,
+        status: response.status,
+        statusText: response.statusText,
+        error: errorData
+      });
+      
+      throw new Error(errorData.message || errorData.error || `API request failed: ${response.statusText}`);
     }
 
     return await response.json();
   } catch (error) {
-    console.error(`API Request Error (${backend}):`, error);
+    // Don't log if it's already a known error with message
+    if (!error.message || error.message.includes('API request failed')) {
+      console.error(`API Request Error (${backend}):`, {
+        endpoint: `${baseURL}${endpoint}`,
+        error: error.message || error
+      });
+    }
     throw error;
   }
 };
@@ -235,6 +258,55 @@ export const lmsApi = {
 
     return await response.json();
   },
+  putFormData: async (endpoint, formData, options) => {
+    const token = getAdminToken();
+    if (!token) {
+      throw new Error('No authentication token available');
+    }
+    
+    const response = await fetch(`${LMS_API_URL}${endpoint}`, {
+      ...options,
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `API request failed: ${response.statusText}`);
+    }
+
+    return await response.json();
+  },
+  patchFormData: async (endpoint, formData, options) => {
+    const token = getAdminToken();
+    if (!token) {
+      throw new Error('No authentication token available');
+    }
+    
+    const response = await fetch(`${LMS_API_URL}${endpoint}`, {
+      ...options,
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `API request failed: ${response.statusText}`);
+    }
+
+    return await response.json();
+  },
+  patch: (endpoint, data, options) => apiRequest('lms', endpoint, { 
+    ...options, 
+    method: 'PATCH', 
+    body: JSON.stringify(data) 
+  }),
 };
 
 /**

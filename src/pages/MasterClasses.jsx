@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "react-calendar/dist/Calendar.css";
 
@@ -25,10 +25,15 @@ const MasterClasses = () => {
 
   // ✅ Load Masterclass Data with Admin Token
   useEffect(() => {
+    let isCancelled = false; // Flag to track if component unmounted
+
     const loadData = async () => {
       try {
         setLoading(true);
         const result = await vtsApi.get('/api/masterclass');
+
+        // Don't update state if component unmounted (StrictMode cleanup)
+        if (isCancelled) return;
 
         if (result.success && Array.isArray(result.data)) {
           setData(result.data);
@@ -44,13 +49,22 @@ const MasterClasses = () => {
           console.error("Invalid API response:", result);
         }
       } catch (err) {
-        console.error("Error fetching masterclasses:", err);
+        if (!isCancelled) {
+          console.error("Error fetching masterclasses:", err);
+        }
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
 
     loadData();
+
+    // Cleanup function: runs when component unmounts or before re-running effect
+    return () => {
+      isCancelled = true;
+    };
   }, []);
 
   // ✅ Add New Event

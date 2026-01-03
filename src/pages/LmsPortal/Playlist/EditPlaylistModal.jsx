@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { updatePlaylist, fetchPlaylistById } from "../API/playlistApi";
 
-const AddPlaylistModal = ({ onClose, onAdd }) => {
+const EditPlaylistModal = ({ playlistId, onClose, onUpdate }) => {
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
@@ -12,6 +13,36 @@ const AddPlaylistModal = ({ onClose, onAdd }) => {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(true);
+
+  useEffect(() => {
+    if (playlistId) {
+      loadPlaylistData();
+    }
+  }, [playlistId]);
+
+  const loadPlaylistData = async () => {
+    try {
+      setLoadingData(true);
+      const playlist = await fetchPlaylistById(playlistId);
+      if (playlist) {
+        setFormData({
+          title: playlist.title || "",
+          slug: playlist.slug || "",
+          description: playlist.description || "",
+          tags: Array.isArray(playlist.tags) ? playlist.tags.join(", ") : playlist.tags || "",
+          isPublic: playlist.isPublic !== undefined ? playlist.isPublic : true,
+          thumbnail: null,
+          thumbnailUrl: playlist.thumbnailUrl || "",
+        });
+      }
+    } catch (error) {
+      console.error("Error loading playlist:", error);
+      setErrors({ submit: error.message || "Failed to load playlist data" });
+    } finally {
+      setLoadingData(false);
+    }
+  };
 
   // Auto-generate slug from title
   const generateSlug = (title) => {
@@ -96,30 +127,33 @@ const AddPlaylistModal = ({ onClose, onAdd }) => {
         playlistData.thumbnailUrl = formData.thumbnailUrl.trim();
       }
 
-      await onAdd(playlistData);
-      // Reset form
-      setFormData({
-        title: "",
-        slug: "",
-        description: "",
-        tags: "",
-        isPublic: true,
-        thumbnail: null,
-        thumbnailUrl: "",
-      });
-      setErrors({});
+      await updatePlaylist(playlistId, playlistData);
+      await onUpdate();
+      onClose();
     } catch (error) {
-      console.error("Error creating playlist:", error);
-      setErrors({ submit: error.message || "Failed to create playlist" });
+      console.error("Error updating playlist:", error);
+      setErrors({ submit: error.message || "Failed to update playlist" });
     } finally {
       setLoading(false);
     }
   };
 
+  if (loadingData) {
+    return (
+      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+        <div className="bg-white w-full max-w-2xl rounded-xl p-6">
+          <div className="flex items-center justify-center py-12">
+            <div className="text-gray-500">Loading playlist data...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
       <div className="bg-white w-full max-w-2xl rounded-xl p-6 max-h-[90vh] overflow-y-auto">
-        <h2 className="text-xl font-semibold mb-6 text-gray-800">Add New Playlist</h2>
+        <h2 className="text-xl font-semibold mb-6 text-gray-800">Edit Playlist</h2>
 
         <div className="space-y-4">
           {/* Title */}
@@ -196,8 +230,8 @@ const AddPlaylistModal = ({ onClose, onAdd }) => {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Tags
             </label>
-        <input
-          type="text"
+            <input
+              type="text"
               name="tags"
               placeholder="e.g., dsa, beginner, cpp (comma-separated)"
               value={formData.tags}
@@ -238,7 +272,19 @@ const AddPlaylistModal = ({ onClose, onAdd }) => {
               value={formData.thumbnailUrl}
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-400"
-        />
+            />
+            {formData.thumbnailUrl && (
+              <div className="mt-2">
+                <img
+                  src={formData.thumbnailUrl}
+                  alt="Current thumbnail"
+                  className="w-32 h-32 object-cover rounded-lg border border-gray-300"
+                  onError={(e) => {
+                    e.target.style.display = "none";
+                  }}
+                />
+              </div>
+            )}
           </div>
 
           {/* Public Visibility */}
@@ -275,7 +321,7 @@ const AddPlaylistModal = ({ onClose, onAdd }) => {
             disabled={loading}
             className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Creating..." : "Create Playlist"}
+            {loading ? "Updating..." : "Update Playlist"}
           </button>
         </div>
       </div>
@@ -283,4 +329,5 @@ const AddPlaylistModal = ({ onClose, onAdd }) => {
   );
 };
 
-export default AddPlaylistModal;
+export default EditPlaylistModal;
+

@@ -10,10 +10,15 @@ const MasterClassDetails = ({ onBack }) => {
 
   // ✅ Fetch event + students by ID with Admin Token
   useEffect(() => {
+    let isCancelled = false; // Flag to track if component unmounted
+
     const fetchEventDetails = async () => {
       try {
         setLoading(true);
         const data = await vtsApi.get(`/api/masterclass/${id}/students`);
+
+        // Don't update state if component unmounted (StrictMode cleanup)
+        if (isCancelled) return;
 
         if (data && data.masterclassId) {
           setEventData(data);
@@ -21,14 +26,23 @@ const MasterClassDetails = ({ onBack }) => {
           setError("Event not found or invalid response");
         }
       } catch (err) {
-        console.error("Error fetching masterclass details:", err);
-        setError("Failed to load event details");
+        if (!isCancelled) {
+          console.error("Error fetching masterclass details:", err);
+          setError("Failed to load event details");
+        }
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
 
     fetchEventDetails();
+
+    // Cleanup function: runs when component unmounts or before re-running effect
+    return () => {
+      isCancelled = true;
+    };
   }, [id]);
 
   if (loading)
