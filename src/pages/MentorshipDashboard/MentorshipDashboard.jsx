@@ -9,10 +9,15 @@ const MentorshipDashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isCancelled = false; // Flag to track if component unmounted
+
     const load = async () => {
       try {
         setLoading(true);
         const apiData = await vtsApi.get('/api/mentorship');
+
+        // Don't update state if component unmounted (StrictMode cleanup)
+        if (isCancelled) return;
 
         if (apiData && apiData.sessions) {
           // --- TRANSFORM API DATA → UI FORMAT ---
@@ -59,14 +64,23 @@ const MentorshipDashboard = () => {
           setData(localData); // fallback to local JSON
         }
       } catch (err) {
-        console.error("Error fetching mentorship data:", err);
-        setData(localData); // fallback
+        if (!isCancelled) {
+          console.error("Error fetching mentorship data:", err);
+          setData(localData); // fallback
+        }
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
 
     load();
+
+    // Cleanup function: runs when component unmounts or before re-running effect
+    return () => {
+      isCancelled = true;
+    };
   }, []);
 
   if (loading || !data)

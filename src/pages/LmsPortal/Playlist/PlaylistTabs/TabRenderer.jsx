@@ -2,28 +2,21 @@ import VideoTab from "./VideoTab";
 import NotesTab from "./NotesTab";
 import PptTab from "./PptTab";
 import TestTab from "./TestTab";
-import QuestionForm from "./QuestionForm";
 
-export default function TabRenderer({
-  activeTab,
-  playlist,
-  session,
-  openQuestionForm,
-}) {
-
+export default function TabRenderer({ activeTab, session, onRefresh }) {
   if (!session) {
     return <p className="text-gray-500 mt-6">Please select a session</p>;
   }
 
   switch (activeTab) {
     case "videos":
-      return <VideoTab playlist={playlist} session={session} />;
+      return <VideoTab session={session} onRefresh={onRefresh} />;
     case "notes":
-      return <NotesTab playlist={playlist} session={session} />;
+      return <NotesTab session={session} onRefresh={onRefresh} />;
     case "ppt":
-      return <PptTab playlist={playlist} session={session} />;
+      return <PptTab session={session} onRefresh={onRefresh} />;
     case "test":
-      return <TestTab playlist={playlist} session={session} openQuestionForm={openQuestionForm} />;
+      return <TestTab session={session} onRefresh={onRefresh} />;
     default:
       return null;
   }

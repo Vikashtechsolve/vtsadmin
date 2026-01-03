@@ -15,10 +15,15 @@ const DoubtSolving = () => {
 
   // Fetch data from API with Admin Token
   useEffect(() => {
+    let isCancelled = false; // Flag to track if component unmounted
+
     const fetchDoubts = async () => {
       try {
         setLoading(true);
         const result = await vtsApi.get('/api/doubts');
+
+        // Don't update state if component unmounted (StrictMode cleanup)
+        if (isCancelled) return;
 
         if (result?.sessions && Array.isArray(result.sessions)) {
           // Transform API data to match expected format
@@ -68,15 +73,24 @@ const DoubtSolving = () => {
           setData(localData);
         }
       } catch (err) {
-        console.error("❌ Failed to fetch doubts:", err);
-        // Fallback to local data on error
-        setData(localData);
+        if (!isCancelled) {
+          console.error("❌ Failed to fetch doubts:", err);
+          // Fallback to local data on error
+          setData(localData);
+        }
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
 
     fetchDoubts();
+
+    // Cleanup function: runs when component unmounts or before re-running effect
+    return () => {
+      isCancelled = true;
+    };
   }, []);
 
   // View details modal
