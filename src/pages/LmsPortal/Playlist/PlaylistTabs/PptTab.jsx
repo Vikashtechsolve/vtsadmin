@@ -2,6 +2,7 @@ import MediaManager from "./MediaManager";
 
 export default function PptTab({ session, onRefresh }) {
   // Find the single PPT file (type === "ppt")
+  // Note: We use type="ppt" to match backend expectations
   // API returns resources with 'asset' property when transformed
   const pptResource = session?.resources?.find(
     (r) => {
@@ -28,6 +29,13 @@ export default function PptTab({ session, onRefresh }) {
   let pptAsset = null;
   if (pptResource) {
     pptAsset = pptResource.asset || (typeof pptResource.assetId === 'object' ? pptResource.assetId : null);
+  }
+
+  // Debug logging to help troubleshoot upload issues
+  if (process.env.NODE_ENV === 'development') {
+    console.log('PptTab - Session resources:', session?.resources);
+    console.log('PptTab - Found PPT resource:', pptResource);
+    console.log('PptTab - PPT asset:', pptAsset);
   }
 
   return (

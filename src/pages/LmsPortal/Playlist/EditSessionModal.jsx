@@ -244,7 +244,7 @@ const EditSessionModal = ({ onClose, onUpdate, sessionId, moduleId, playlistId, 
           {/* Order */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Order
+              Order <span className="text-gray-400 font-normal">(Current: {formData.order || "Not set"})</span>
             </label>
             <input
               type="number"
@@ -263,7 +263,7 @@ const EditSessionModal = ({ onClose, onUpdate, sessionId, moduleId, playlistId, 
               <p className="text-red-500 text-xs mt-1">{errors.order}</p>
             )}
             <p className="text-gray-500 text-xs mt-1">
-              Position of this session in the module
+              Position of this session in the module (lower numbers appear first). Leave empty to keep current order or remove ordering.
             </p>
           </div>
 

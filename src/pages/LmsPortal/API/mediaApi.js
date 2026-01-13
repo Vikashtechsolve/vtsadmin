@@ -1,13 +1,13 @@
 import { lmsApi } from "../../../services/apiService";
 
 /**
- * Upload a media asset (video, PDF, PPT, notes)
+ * Upload a media asset (video, PDF, PPT)
  * @param {File} file - File to upload
- * @param {string} type - Asset type: "video", "pdf", "ppt", "notes"
- * @param {string} sessionId - Session ID
+ * @param {string} type - Asset type: "video", "pdf", "ppt"
+ * @param {string} sessionId - Session ID (REQUIRED for PDF/PPT uploads)
  * @param {string} playlistId - Playlist ID (required)
  * @param {string} moduleId - Module ID (optional)
- * @param {string} label - Label for resource (optional, for PDF/PPT/notes)
+ * @param {string} label - Label for resource (optional, defaults to "PDF Notes" for PDF, "Slides" for PPT)
  * @param {boolean} convertToHls - Convert video to HLS (default: true for videos)
  * @param {boolean} downloadable - Allow file download (default: false)
  * @returns {Promise} Uploaded media asset
@@ -23,26 +23,67 @@ export const uploadMediaAsset = async ({
   downloadable = false,
 }) => {
   try {
+    // Validate required fields
+    if (!file) {
+      throw new Error("File is required");
+    }
+    if (!type) {
+      throw new Error("Asset type is required");
+    }
+    
+    // CRITICAL: sessionId MUST be included for PDF/PPT uploads
+    if ((type === "pdf" || type === "ppt") && !sessionId) {
+      console.warn(`⚠️ PDF/PPT uploaded but sessionId missing! Type: ${type}, File: ${file.name}`);
+      throw new Error(`sessionId is required for ${type.toUpperCase()} uploads`);
+    }
+    
+    if (!playlistId) {
+      throw new Error("playlistId is required");
+    }
+
     const formData = new FormData();
     formData.append("file", file);
     formData.append("type", type);
-    formData.append("sessionId", sessionId);
+    
+    // Ensure sessionId is always included (especially for PDF/PPT)
+    if (sessionId) {
+      formData.append("sessionId", sessionId);
+    } else if (type !== "video") {
+      // For non-video assets, sessionId should be present
+      console.warn(`⚠️ Warning: sessionId not provided for ${type} upload`);
+    }
+    
     formData.append("playlistId", playlistId);
     if (moduleId) formData.append("moduleId", moduleId);
-    if (label) formData.append("label", label);
+    
+    // Add label for PDF/PPT (default if not provided)
+    if (type === "pdf" || type === "ppt") {
+      formData.append("label", label || (type === "pdf" ? "PDF Notes" : "Slides"));
+    } else if (label) {
+      formData.append("label", label);
+    }
+    
     if (type === "video") {
       formData.append("convertToHls", convertToHls.toString());
     }
     formData.append("downloadable", downloadable.toString());
 
+    console.log(`📤 Uploading ${type} file: ${file.name}, sessionId: ${sessionId || 'NOT PROVIDED'}`);
+
     const response = await lmsApi.postFormData("/admin/media-assets/upload", formData);
 
     if (response.success && response.data) {
-      return response.data;
+      const asset = response.data;
+      // Log warning if sessionId was missing and asset was created
+      if (!sessionId && (type === "pdf" || type === "ppt")) {
+        console.warn(`⚠️ PDF/PPT uploaded but sessionId missing! Asset ID: ${asset._id || asset.id}`);
+      }
+      console.log(`✅ Successfully uploaded ${type} asset: ${asset._id || asset.id}`);
+      return asset;
     }
     throw new Error(response.message || "Failed to upload media asset");
   } catch (error) {
-    console.error("Error uploading media asset:", error);
+    console.error(`❌ Error uploading ${type} asset:`, error);
     throw error;
   }
 };

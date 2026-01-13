@@ -356,9 +356,22 @@ export default function PlaylistDetails() {
                           No sessions in this module
                         </div>
                       ) : (
-                        moduleSessions.map((session) => {
-                          const sessionId = session.sessionId || session._id;
-                          return (
+                        // Sort sessions by order field (sessions without order go to the end)
+                        [...moduleSessions]
+                          .sort((a, b) => {
+                            const orderA = a.order !== undefined && a.order !== null ? parseInt(a.order) : 999999;
+                            const orderB = b.order !== undefined && b.order !== null ? parseInt(b.order) : 999999;
+                            if (orderA !== orderB) {
+                              return orderA - orderB;
+                            }
+                            // If order is the same, sort by creation date (older first for consistency)
+                            const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+                            const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+                            return dateA - dateB;
+                          })
+                          .map((session) => {
+                            const sessionId = session.sessionId || session._id;
+                            return (
                             <div
                               key={sessionId}
                               className="flex justify-between text-sm items-center border-2 border-gray-300 rounded-xl p-3 bg-white hover:border-blue-400 hover:shadow-md transition-all"
@@ -369,6 +382,11 @@ export default function PlaylistDetails() {
                               >
                                 <p className="font-medium flex gap-2 items-center">
                                   <GraduationCapIcon size={22} color="#000000" />
+                                  {session.order !== undefined && session.order !== null && (
+                                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded font-normal">
+                                      #{session.order}
+                                    </span>
+                                  )}
                                   {session.title}
                                 </p>
                                 {session.createdAt && (
