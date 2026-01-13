@@ -40,6 +40,19 @@ export default function MediaManager({
       return;
     }
 
+    // Validate sessionId for PDF/PPT uploads
+    if ((type === "pdf" || type === "ppt") && !session?._id) {
+      setError("Session ID is required for PDF/PPT uploads. Please ensure you're uploading from a valid session.");
+      console.error("❌ Missing sessionId for PDF/PPT upload:", { type, session });
+      return;
+    }
+
+    if (!session?.playlistId) {
+      setError("Playlist ID is required for uploads.");
+      console.error("❌ Missing playlistId:", { session });
+      return;
+    }
+
     try {
       setUploading(true);
       setError(null);
