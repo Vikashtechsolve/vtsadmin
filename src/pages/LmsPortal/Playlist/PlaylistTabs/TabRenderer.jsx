@@ -2,6 +2,7 @@ import VideoTab from "./VideoTab";
 import NotesTab from "./NotesTab";
 import PptTab from "./PptTab";
 import TestTab from "./TestTab";
+import AssignmentTab from "./AssignmentTab";
 
 export default function TabRenderer({ activeTab, session, onRefresh }) {
   if (!session) {
@@ -17,6 +18,8 @@ export default function TabRenderer({ activeTab, session, onRefresh }) {
       return <PptTab session={session} onRefresh={onRefresh} />;
     case "test":
       return <TestTab session={session} onRefresh={onRefresh} />;
+    case "assignment":
+      return <AssignmentTab session={session} onRefresh={onRefresh} />;
     default:
       return null;
   }

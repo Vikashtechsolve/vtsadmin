@@ -38,6 +38,7 @@ import SessionDetails from "./pages/LmsPortal/Playlist/PlaylistTabs/SessionDetai
 import QuestionForm from "./pages/LmsPortal/Playlist/PlaylistTabs/QuestionForm";
 import TabRenderer from "./pages/LmsPortal/Playlist/PlaylistTabs/TabRenderer";
 import NewsSection from "./pages/LmsPortal/News/NewsSection";
+import MasterClassesSection from "./pages/LmsPortal/MasterClasses/MasterClassesSection";
 
 const AppLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -211,6 +212,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <NewsSection />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/lmsDashboard/masterClasses"
+            element={
+              <ProtectedRoute>
+                <MasterClassesSection />
               </ProtectedRoute>
             }
           />
