@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Upload, Trash2, X, CheckCircle2, AlertCircle } from "lucide-react";
 import { uploadMediaAsset, deleteMediaAsset } from "../../API/mediaApi";
 import FileCard from "./FileCard";
@@ -21,17 +21,31 @@ export default function MediaManager({
 
   const handleFileSelect = (e) => {
     const selectedFile = e.target.files[0];
-    if (!selectedFile) return;
+    if (!selectedFile) {
+      setFile(null);
+      return;
+    }
+
+    // Clear any previous errors
+    setError(null);
 
     // Check file size
     const fileSizeMB = selectedFile.size / (1024 * 1024);
     if (fileSizeMB > maxSizeMB) {
       setError(`File size exceeds ${maxSizeMB}MB limit`);
+      setFile(null); // Clear file if size exceeds limit
       return;
     }
 
+    // Auto-detect file type from extension if type is zip (for assignments)
+    if (type === "zip") {
+      const detectedType = getFileTypeFromExtension(selectedFile.name);
+      console.log(`📄 File selected: ${selectedFile.name}, detected type: ${detectedType}, original type: ${type}`);
+    }
+
+    // Set the file - this enables the upload button
     setFile(selectedFile);
-    setError(null);
+    console.log(`✅ File set: ${selectedFile.name}, size: ${fileSizeMB.toFixed(2)}MB, type: ${type}`);
   };
 
   const handleUpload = async () => {
@@ -40,12 +54,7 @@ export default function MediaManager({
       return;
     }
 
-    // Validate sessionId for PDF/PPT uploads
-    if ((type === "pdf" || type === "ppt") && !session?._id) {
-      setError("Session ID is required for PDF/PPT uploads. Please ensure you're uploading from a valid session.");
-      console.error("❌ Missing sessionId for PDF/PPT upload:", { type, session });
-      return;
-    }
+    // Note: Session validation moved to inside handleUpload after file type detection
 
     if (!session?.playlistId) {
       setError("Playlist ID is required for uploads.");
@@ -57,14 +66,38 @@ export default function MediaManager({
       setUploading(true);
       setError(null);
 
+      // Auto-detect file type from extension for assignments (zip type)
+      let uploadType = type;
+      if (type === "zip" && file) {
+        const detectedType = getFileTypeFromExtension(file.name);
+        uploadType = detectedType;
+      }
+
+      // Validate sessionId for PDF/PPT/ZIP uploads
+      if ((uploadType === "pdf" || uploadType === "ppt" || uploadType === "zip" || uploadType === "notes") && !session?._id) {
+        setError("Session ID is required for file uploads. Please ensure you're uploading from a valid session.");
+        console.error("❌ Missing sessionId for upload:", { uploadType, session });
+        setUploading(false);
+        return;
+      }
+
+      // Preserve the original label if it's "Assignment" even when type changes
+      let uploadLabel = customLabel || label || undefined;
+      // If original type was "zip" (assignment), ensure label is preserved
+      if (type === "zip") {
+        uploadLabel = uploadLabel || "Assignment";
+      }
+
+      console.log(`📤 Uploading assignment: type=${uploadType}, label=${uploadLabel}, file=${file.name}`);
+
       await uploadMediaAsset({
         file,
-        type,
+        type: uploadType,
         sessionId: session._id,
         playlistId: session.playlistId,
         moduleId: session.moduleId,
-        label: customLabel || label || undefined,
-        convertToHls: type === "video",
+        label: uploadLabel,
+        convertToHls: uploadType === "video",
         downloadable: false,
       });
 
@@ -111,6 +144,11 @@ export default function MediaManager({
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
+
+  // Debug: Log file state changes
+  useEffect(() => {
+    console.log(`🔍 MediaManager state: file=${file?.name || 'null'}, uploading=${uploading}, error=${error || 'none'}, type=${type}`);
+  }, [file, uploading, error, type]);
 
   return (
     <div className="space-y-4">
@@ -210,8 +248,9 @@ export default function MediaManager({
               <div className="flex gap-2 pt-2">
                 <button
                   onClick={handleUpload}
-                  disabled={!file || uploading}
+                  disabled={!file || uploading || !!error}
                   className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex-1"
+                  title={!file ? "Please select a file" : error ? error : uploading ? "Uploading..." : "Upload file"}
                 >
                   {uploading ? "Uploading..." : "Upload"}
                 </button>

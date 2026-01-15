@@ -10,7 +10,7 @@ export default function PlaylistTabs({ onTabChange }) {
 
   return (
     <div className="flex w-full justify-center gap-4 border-b border-[#E6E6E6] pb-4">
-      {["videos", "notes", "ppt", "test"].map((tab) => (
+      {["videos", "notes", "ppt", "assignment", "test"].map((tab) => (
         <button
           key={tab}
           onClick={() => handleTab(tab)}

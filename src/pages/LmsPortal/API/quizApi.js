@@ -171,3 +171,27 @@ export const deleteQuiz = async (quizId) => {
   }
 };
 
+/**
+ * Create multiple MCQ questions in bulk (for CSV upload)
+ * @param {Array} questions - Array of question objects
+ * @param {string} quizId - Optional quiz ID to add questions to
+ * @returns {Promise} Bulk creation result
+ */
+export const createBulkMCQQuestions = async (questions, quizId) => {
+  try {
+    const payload = {
+      questions,
+      quizId: quizId || undefined
+    };
+    
+    const response = await lmsApi.post("/admin/mcq-questions/bulk", payload);
+    if (response.success && response.data) {
+      return response.data;
+    }
+    throw new Error(response.message || "Failed to create questions in bulk");
+  } catch (error) {
+    console.error("Error creating bulk MCQ questions:", error);
+    throw error;
+  }
+};
+
