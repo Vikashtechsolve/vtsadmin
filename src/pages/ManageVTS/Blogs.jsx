@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2, Eye, Search, Calendar, User, Tag, Clock, Heart } from "lucide-react";
+import { Plus, Edit2, Trash2, Search, Calendar, User, Tag, Clock, Heart, Globe } from "lucide-react";
 import BlogForm from "./components/BlogForm";
-import { getBlogs, deleteBlog } from "../../utils/blogApi";
+import { getBlogs, deleteBlog, getBlogById } from "../../utils/blogApi";
+
+const SITE_LABELS = {
+  vts: "VTS",
+  skilltrixa: "SkillTrixa",
+};
 
 const Blogs = () => {
   const [blogs, setBlogs] = useState([]);
@@ -10,15 +15,19 @@ const Blogs = () => {
   const [editingBlog, setEditingBlog] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [filterSite, setFilterSite] = useState("all");
+  const [loadingEditId, setLoadingEditId] = useState(null);
 
   useEffect(() => {
     fetchBlogs();
-  }, []);
+  }, [filterSite]);
 
   const fetchBlogs = async () => {
     try {
       setLoading(true);
-      const result = await getBlogs();
+      const params =
+        filterSite === "all" ? {} : { site: filterSite };
+      const result = await getBlogs(params);
       
       if (result.success) {
         setBlogs(result.data);
@@ -37,9 +46,22 @@ const Blogs = () => {
     setShowForm(true);
   };
 
-  const handleEdit = (blog) => {
-    setEditingBlog(blog);
-    setShowForm(true);
+  const handleEdit = async (blog) => {
+    try {
+      setLoadingEditId(blog.id);
+      const result = await getBlogById(blog.id);
+      if (result.success && result.data) {
+        setEditingBlog(result.data);
+        setShowForm(true);
+      } else {
+        alert(result.error || "Could not load this blog. Try again.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Could not load this blog. Try again.");
+    } finally {
+      setLoadingEditId(null);
+    }
   };
 
   const handleDelete = async (id) => {
@@ -79,7 +101,10 @@ const Blogs = () => {
     const matchesStatus =
       filterStatus === "all" || blog.status === filterStatus;
 
-    return matchesSearch && matchesStatus;
+    const sk = blog.siteKey || "vts";
+    const matchesSite = filterSite === "all" || sk === filterSite;
+
+    return matchesSearch && matchesStatus && matchesSite;
   });
 
   if (loading) {
@@ -124,6 +149,15 @@ const Blogs = () => {
           />
         </div>
         <select
+          value={filterSite}
+          onChange={(e) => setFilterSite(e.target.value)}
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none cursor-pointer min-w-[11rem]"
+        >
+          <option value="all">All websites</option>
+          <option value="vts">VTS only</option>
+          <option value="skilltrixa">SkillTrixa only</option>
+        </select>
+        <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
           className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none cursor-pointer"
@@ -152,6 +186,9 @@ const Blogs = () => {
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                   Blog
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                  Website
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                   Category
@@ -203,6 +240,12 @@ const Blogs = () => {
                         </div>
                       </div>
                     </div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-slate-100 text-slate-800 rounded">
+                      <Globe size={12} />
+                      {SITE_LABELS[blog.siteKey] || SITE_LABELS.vts}
+                    </span>
                   </td>
                   <td className="px-4 py-4">
                     <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded">
@@ -272,7 +315,8 @@ const Blogs = () => {
                     <div className="flex items-center justify-end gap-2">
                       <button
                         onClick={() => handleEdit(blog)}
-                        className="text-blue-600 hover:text-blue-800 p-1 cursor-pointer"
+                        disabled={loadingEditId === blog.id}
+                        className="text-blue-600 hover:text-blue-800 p-1 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                         title="Edit"
                       >
                         <Edit2 size={16} />
