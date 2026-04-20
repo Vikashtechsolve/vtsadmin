@@ -31,9 +31,9 @@ export const uploadMediaAsset = async ({
       throw new Error("Asset type is required");
     }
     
-    // CRITICAL: sessionId MUST be included for PDF/PPT uploads
-    if ((type === "pdf" || type === "ppt") && !sessionId) {
-      console.warn(`⚠️ PDF/PPT uploaded but sessionId missing! Type: ${type}, File: ${file.name}`);
+    // CRITICAL: sessionId MUST be included for PDF/PPT/ZIP/Notes uploads (assignments)
+    if ((type === "pdf" || type === "ppt" || type === "zip" || type === "notes") && !sessionId) {
+      console.warn(`⚠️ File uploaded but sessionId missing! Type: ${type}, File: ${file.name}`);
       throw new Error(`sessionId is required for ${type.toUpperCase()} uploads`);
     }
     
@@ -56,11 +56,16 @@ export const uploadMediaAsset = async ({
     formData.append("playlistId", playlistId);
     if (moduleId) formData.append("moduleId", moduleId);
     
-    // Add label for PDF/PPT (default if not provided)
-    if (type === "pdf" || type === "ppt") {
-      formData.append("label", label || (type === "pdf" ? "PDF Notes" : "Slides"));
-    } else if (label) {
+    // Add label for PDF/PPT/ZIP/Notes (default if not provided)
+    // Always include label if provided, regardless of type
+    if (label) {
       formData.append("label", label);
+    } else if (type === "pdf" || type === "ppt") {
+      formData.append("label", type === "pdf" ? "PDF Notes" : "Slides");
+    } else if (type === "zip") {
+      formData.append("label", "Assignment");
+    } else if (type === "notes") {
+      formData.append("label", "Notes");
     }
     
     if (type === "video") {

@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2, Clock, Target, Shuffle, X } from "lucide-react";
+import { Plus, Edit2, Trash2, Clock, Target, Shuffle, X, Upload } from "lucide-react";
 import { fetchSessionQuiz } from "../../API/sessionApi";
 import { createQuiz, updateQuiz, deleteQuiz, deleteMCQQuestion } from "../../API/quizApi";
 import QuestionForm from "./QuestionForm";
+import CSVUploadModal from "./CSVUploadModal";
 
 export default function QuizManagement({ sessionId, onRefresh }) {
   const [quiz, setQuiz] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showQuestionForm, setShowQuestionForm] = useState(false);
+  const [showCSVUpload, setShowCSVUpload] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState(null);
   const [editingQuiz, setEditingQuiz] = useState(false);
   const [removingQuestionId, setRemovingQuestionId] = useState(null);
@@ -392,6 +394,13 @@ export default function QuizManagement({ sessionId, onRefresh }) {
               <Plus className="w-5 h-5" />
               Add Question
             </button>
+            <button
+              onClick={() => setShowCSVUpload(true)}
+              className="px-6 py-3 bg-green-600 text-white rounded-lg flex items-center gap-2 hover:bg-green-700"
+            >
+              <Upload className="w-5 h-5" />
+              Upload CSV
+            </button>
           </div>
 
           {quiz.questions && quiz.questions.length > 0 ? (
@@ -477,15 +486,36 @@ export default function QuizManagement({ sessionId, onRefresh }) {
           ) : (
             <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
               <p className="text-gray-500 mb-4">No questions added yet</p>
-              <button
-                onClick={() => setShowQuestionForm(true)}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                Add First Question
-              </button>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={() => setShowQuestionForm(true)}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  Add First Question
+                </button>
+                <button
+                  onClick={() => setShowCSVUpload(true)}
+                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+                >
+                  <Upload className="w-4 h-4" />
+                  Upload CSV
+                </button>
+              </div>
             </div>
           )}
         </div>
+      )}
+
+      {/* CSV Upload Modal */}
+      {showCSVUpload && (
+        <CSVUploadModal
+          quizId={quiz?._id}
+          onClose={() => setShowCSVUpload(false)}
+          onSuccess={() => {
+            setShowCSVUpload(false);
+            loadQuiz();
+          }}
+        />
       )}
     </div>
   );

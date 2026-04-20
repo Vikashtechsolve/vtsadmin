@@ -8,6 +8,7 @@ import { Bell, Play, Search, UserRound } from "lucide-react";
 import PlaylistsSection from "./Playlist/PlaylistsSection";
 import Blogs from "./Blogs/Blogs";
 import News from "./News/News";
+import MasterClasses from "./MasterClasses/MasterClasses";
 import {
   CalendarCheck2,
   ListVideo,
@@ -145,6 +146,11 @@ const LmsDashboard = () => {
           <div className="mt-8">
             <h1 className="text-red-700 font-semibold text-xl mb-4">News</h1>
             <News />
+          </div>
+
+          <div className="mt-8">
+            <h1 className="text-red-700 font-semibold text-xl mb-4">Master Classes</h1>
+            <MasterClasses />
           </div>
         </div>
 
