@@ -14,6 +14,7 @@ const BlogForm = ({ blog, onClose, onSubmit }) => {
     tags: "",
     content: "",
     status: "draft",
+    siteKey: "vts",
     hero: null,
   });
   const [loading, setLoading] = useState(false);
@@ -21,23 +22,37 @@ const BlogForm = ({ blog, onClose, onSubmit }) => {
   const [preview, setPreview] = useState(null);
 
   useEffect(() => {
-    if (blog) {
+    if (!blog) {
       setFormData({
-        title: blog.title || "",
-        category: blog.category || "",
-        excerpt: blog.excerpt || "",
-        author: blog.author || "",
-        date: blog.date || new Date().toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }),
-        readTime: blog.readTime || "",
-        tags: blog.tags ? blog.tags.join(", ") : "",
-        content: blog.content || "",
-        status: blog.status || "draft",
+        title: "",
+        category: "",
+        excerpt: "",
+        author: "",
+        date: new Date().toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }),
+        readTime: "",
+        tags: "",
+        content: "",
+        status: "draft",
+        siteKey: "vts",
         hero: null,
       });
-      if (blog.hero) {
-        setPreview(blog.hero);
-      }
+      setPreview(null);
+      return;
     }
+    setFormData({
+      title: blog.title || "",
+      category: blog.category || "",
+      excerpt: blog.excerpt || "",
+      author: blog.author || "",
+      date: blog.date || new Date().toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }),
+      readTime: blog.readTime || "",
+      tags: blog.tags ? blog.tags.join(", ") : "",
+      content: blog.content || "",
+      status: blog.status || "draft",
+      siteKey: blog.siteKey || "vts",
+      hero: null,
+    });
+    setPreview(blog.hero || null);
   }, [blog]);
 
   const handleChange = (e) => {
@@ -125,6 +140,29 @@ const BlogForm = ({ blog, onClose, onSubmit }) => {
                 {error}
               </div>
             )}
+
+            <div className="rounded-xl border border-amber-100 bg-amber-50/60 px-4 py-3 text-sm text-amber-900">
+              <strong className="font-medium">Show on website</strong>
+              <p className="mt-1 text-amber-900/80">
+                Pick which public site loads this post (VTS vs SkillTrixa). You can change it anytime when editing.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Company / website <span className="text-red-500">*</span>
+              </label>
+              <select
+                name="siteKey"
+                value={formData.siteKey}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none cursor-pointer"
+              >
+                <option value="vts">VTS (Vikash Tech Solution)</option>
+                <option value="skilltrixa">SkillTrixa</option>
+              </select>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>

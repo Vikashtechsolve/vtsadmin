@@ -200,7 +200,8 @@ export const prepareBlogFormData = (blogData) => {
   formData.append("tags", blogData.tags || "");
   formData.append("content", blogData.content || "");
   formData.append("status", blogData.status || "draft");
-  
+  formData.append("siteKey", blogData.siteKey || "vts");
+
   if (blogData.hero instanceof File) {
     formData.append("hero", blogData.hero);
   }
